@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { spawn } from 'child_process';
 import path from 'path';
 import fs from 'fs';
+const pythonCommands = "C:\\Users\\yama\\AppData\\Local\\Programs\\Python\\Python310\\python.exe";
 
 export async function POST() {
   try {
@@ -23,10 +24,10 @@ export async function POST() {
     let result = null;
     let lastError = null;
     
-    const pythonCommands = 'C:\\Users\\yama\\AppData\\Local\\Programs\\Python\\Python310\\python.exe';
+   
       try {
-        console.log(`試行中のコマンド: ${pythonCmd} "${scriptPath}"`);
         
+        pythonCmd = pythonCommands; // Pythonの実行コマンド
         const pythonProcess = spawn(pythonCmd, [scriptPath]);
         
         let stdout = '';
