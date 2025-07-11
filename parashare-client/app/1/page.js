@@ -22,9 +22,13 @@ const StandbyScreen = (props) => {
         
         if (data.success && data.studentID && data.studentID.length > 0) {
           console.log(data.studentID);
-          router.push('/2'); // /2ページに移動
+            router.push({
+            pathname: '/2',
+            query: { studentID: data.studentID }
+            });
         } else {
           console.error('学生番号が取得できませんでした。');
+          router.push('/8');
         }
       } catch (error) {
         console.error('APIエラー:', error);
