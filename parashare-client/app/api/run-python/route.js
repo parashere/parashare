@@ -19,11 +19,11 @@ export async function POST() {
     console.log('Pythonスクリプトファイルが存在することを確認しました');
     
     // 複数のPythonコマンドを試す
-    const pythonCommands = ['python', 'python3', 'py'];
+  
     let result = null;
     let lastError = null;
     
-    for (const pythonCmd of pythonCommands) {
+    const pythonCommands = 'C:\\Users\\yama\\AppData\\Local\\Programs\\Python\\Python310\\python.exe';
       try {
         console.log(`試行中のコマンド: ${pythonCmd} "${scriptPath}"`);
         
@@ -63,14 +63,14 @@ export async function POST() {
         
         console.log(`${pythonCmd} 最終stdout:`, stdout);
         result = stdout;
-        break; // 成功したらループを抜ける
+        
         
       } catch (error) {
         console.log(`${pythonCmd} でエラー:`, error.message);
         lastError = error;
-        continue; // 次のコマンドを試す
+        
       }
-    }
+    
     
     if (!result) {
       throw lastError || new Error('すべてのPythonコマンドが失敗しました');
