@@ -1,9 +1,38 @@
 'use client'
-import React from 'react'
+import React, { useEffect } from 'react'
 import Head from 'next/head'
-
+import { useRouter } from "next/navigation";
 
 const StandbyScreen = (props) => {
+  const router = useRouter();
+
+  useEffect(() => {
+    // APIを呼び出してPythonスクリプトを実行
+    const runPythonScript = async () => {
+      try {
+        console.log('Pythonスクリプトを実行中...');
+        const response = await fetch('/api/run-python', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+
+        const data = await response.json();
+        
+        if (data.success && data.studentID && data.studentID.length > 0) {
+          console.log(data.studentID);
+          router.push('/2'); // /2ページに移動
+        } else {
+          console.error('学生番号が取得できませんでした。');
+        }
+      } catch (error) {
+        console.error('APIエラー:', error);
+      }
+    };
+
+    runPythonScript();
+  }, [router]);
   return (
     <>
       <div className="standby-screen-container">
