@@ -1,10 +1,7 @@
 import { NextResponse } from 'next/server';
-import { exec } from 'child_process';
+import { spawn } from 'child_process';
 import path from 'path';
-import { promisify } from 'util';
 import fs from 'fs';
-
-const execAsync = promisify(exec);
 
 export async function POST() {
   try {
@@ -28,16 +25,43 @@ export async function POST() {
     
     for (const pythonCmd of pythonCommands) {
       try {
-        const command = `${pythonCmd} "${scriptPath}"`;
-        console.log('試行中のコマンド:', command);
+        console.log(`試行中のコマンド: ${pythonCmd} "${scriptPath}"`);
         
-        const { stdout, stderr } = await execAsync(command);
+        const pythonProcess = spawn(pythonCmd, [scriptPath]);
         
-        if (stderr) {
-          console.warn(`${pythonCmd} stderr:`, stderr);
-        }
+        let stdout = '';
+        let stderr = '';
         
-        console.log(`${pythonCmd} stdout:`, stdout);
+        // stdoutデータを収集
+        pythonProcess.stdout.on('data', (data) => {
+          stdout += data.toString();
+          console.log(`${pythonCmd} stdout chunk:`, data.toString());
+        });
+        
+        // stderrデータを収集
+        pythonProcess.stderr.on('data', (data) => {
+          stderr += data.toString();
+          console.warn(`${pythonCmd} stderr chunk:`, data.toString());
+        });
+        
+        // プロセスの終了を待つ
+        await new Promise((resolve, reject) => {
+          pythonProcess.on('close', (code) => {
+            console.log(`${pythonCmd} プロセス終了コード:`, code);
+            if (code === 0) {
+              resolve(stdout);
+            } else {
+              reject(new Error(`プロセスがコード${code}で終了: ${stderr}`));
+            }
+          });
+          
+          pythonProcess.on('error', (error) => {
+            console.log(`${pythonCmd} プロセスエラー:`, error.message);
+            reject(error);
+          });
+        });
+        
+        console.log(`${pythonCmd} 最終stdout:`, stdout);
         result = stdout;
         break; // 成功したらループを抜ける
         
