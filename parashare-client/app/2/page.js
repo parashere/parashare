@@ -1,9 +1,11 @@
 'use client'
 import React from 'react'
 import Head from 'next/head'
-
+import { useRouter } from "next/navigation";
 
 const LoginSuccessScreen = (props) => {
+  const router = useRouter();
+  const { studentID } = router.query;
   return (
     <>
       <div className="login-success-screen-container">
@@ -24,7 +26,7 @@ const LoginSuccessScreen = (props) => {
                 <div className="login-success-screen-student-info">
                   <span className="login-success-screen-text1">学生番号</span>
                 </div>
-                <span className="login-success-screen-text2">2024001234</span>
+                <span className="login-success-screen-text2">{studentID}</span>
                 <button className="login-success-screen-next-button">
                   <span className="login-success-screen-text3">次へ進む</span>
                 </button>
