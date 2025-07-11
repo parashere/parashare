@@ -1,9 +1,15 @@
 'use client'
 import React from 'react'
 import Head from 'next/head'
-
+import { useRouter } from "next/navigation";
 
 const AuthErrorScreen = (props) => {
+  const router = useRouter();
+
+  const handleRetry = () => {
+    console.log('再試行ボタンが押されました。/1ページに遷移します...');
+    router.push('/1');
+  };
   return (
     <>
       <div className="auth-error-screen-container">
@@ -30,15 +36,15 @@ const AuthErrorScreen = (props) => {
                 <span className="auth-error-screen-text3">
                   もう一度お試しください
                 </span>
-                <button className="auth-error-screen-retry-button">
-                  <button className="auth-error-screen-button-content">
+                <button className="auth-error-screen-retry-button" onClick={handleRetry}>
+                  <div className="auth-error-screen-button-content">
                     <img
                       src="/external/refresh-cw.svg"
                       alt="RefreshCw5741"
                       className="auth-error-screen-refresh-cw"
                     />
                     <span className="auth-error-screen-text4">再試行</span>
-                  </button>
+                  </div>
                 </button>
               </div>
             </div>
@@ -188,6 +194,12 @@ const AuthErrorScreen = (props) => {
             border-radius: 32px;
             justify-content: center;
             background-color: rgba(230, 0, 32, 1);
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+          }
+          .auth-error-screen-retry-button:hover {
+            background-color: rgba(200, 0, 28, 1);
           }
           .auth-error-screen-button-content {
             gap: 12px;
@@ -197,6 +209,7 @@ const AuthErrorScreen = (props) => {
             display: flex;
             position: absolute;
             align-items: center;
+            pointer-events: none;
           }
           .auth-error-screen-refresh-cw {
             width: 20px;

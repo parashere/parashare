@@ -1,9 +1,15 @@
 'use client'
 import React from 'react'
 import Head from 'next/head'
-
+import { useRouter } from "next/navigation";
 
 const NoUmbrellaErrorScreen = (props) => {
+  const router = useRouter();
+  
+  const handleRetry = () => {
+    console.log('再試行ボタンが押されました。/1ページに遷移します...');
+    router.push('/1');
+  };
   return (
     <>
       <div className="no-umbrella-error-screen-container">
@@ -38,9 +44,10 @@ const NoUmbrellaErrorScreen = (props) => {
                     図書館前・学生会館・各学部棟入口
                   </span>
                 </div>
-                <button className="no-umbrella-error-screen-retry-button">
-                  <button className="no-umbrella-error-screen-button-content"></button>
-                  <span className="no-umbrella-error-screen-text6">戻る</span>
+                <button className="no-umbrella-error-screen-retry-button" onClick={handleRetry}>
+                  <div className="no-umbrella-error-screen-button-content">
+                    <span className="no-umbrella-error-screen-text6">戻る</span>
+                  </div>
                 </button>
               </div>
             </div>
@@ -233,25 +240,26 @@ const NoUmbrellaErrorScreen = (props) => {
             border-radius: 32px;
             justify-content: center;
             background-color: rgba(255, 193, 7, 1);
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+          }
+          .no-umbrella-error-screen-retry-button:hover {
+            background-color: rgba(235, 173, 0, 1);
           }
           .no-umbrella-error-screen-button-content {
             gap: 12px;
-            top: 21px;
-            left: 77px;
-            width: 36px;
             display: flex;
-            position: absolute;
             align-items: center;
+            justify-content: center;
+            pointer-events: none;
           }
           .no-umbrella-error-screen-text6 {
-            top: 21px;
-            left: 102px;
             color: rgba(255, 255, 255, 1);
             height: auto;
-            position: absolute;
             font-size: 18px;
             font-style: Black;
-            text-align: left;
+            text-align: center;
             font-family: Noto Sans JP;
             font-weight: 900;
             line-height: 21.600000381469727px;

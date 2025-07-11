@@ -1,11 +1,16 @@
 'use client'
 import React from 'react'
 import Head from 'next/head'
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 const LoginSuccessScreen = (props) => {
   const router = useRouter();
-  const { studentID } = router.query;
+  const searchParams = useSearchParams();
+  const studentID = searchParams.get('studentID') || 't323'; // デフォルト値を設定
+  const handleRetry = () => {
+    console.log('再試行ボタンが押されました。/1ページに遷移します...');
+    router.push('/5');
+  };
   return (
     <>
       <div className="login-success-screen-container">
@@ -27,7 +32,7 @@ const LoginSuccessScreen = (props) => {
                   <span className="login-success-screen-text1">学生番号</span>
                 </div>
                 <span className="login-success-screen-text2">{studentID}</span>
-                <button className="login-success-screen-next-button">
+                <button className="login-success-screen-next-button" onClick={handleRetry}>
                   <span className="login-success-screen-text3">次へ進む</span>
                 </button>
               </div>
@@ -165,6 +170,8 @@ const LoginSuccessScreen = (props) => {
             flex-direction: column;
             justify-content: center;
             background-color: rgba(0, 91, 172, 1);
+            border: none;
+            cursor: pointer;
           }
           .login-success-screen-text3 {
             color: rgba(255, 255, 255, 1);

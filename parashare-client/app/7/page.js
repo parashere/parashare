@@ -1,9 +1,28 @@
 'use client'
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import Head from 'next/head'
-
+import { useRouter } from "next/navigation";
 
 const CompletionScreen = (props) => {
+  const router = useRouter();
+  const [countdown, setCountdown] = useState(5);
+
+  useEffect(() => {
+    // カウントダウンタイマー
+    const timer = setInterval(() => {
+      setCountdown((prev) => {
+        if (prev <= 1) {
+          clearInterval(timer);
+          router.push('/1'); // 最初の画面に戻る
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    // コンポーネントがアンマウントされる時にタイマーをクリア
+    return () => clearInterval(timer);
+  }, [router]);
   return (
     <>
       <div className="completion-screen-container">
@@ -42,7 +61,7 @@ const CompletionScreen = (props) => {
                 </span>
               </div>
               <span className="completion-screen-text6">
-                5秒後に最初の画面に戻ります...
+                {countdown}秒後に最初の画面に戻ります...
               </span>
             </div>
           </div>
