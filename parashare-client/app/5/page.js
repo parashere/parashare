@@ -1,9 +1,29 @@
 'use client'
 import React from 'react'
 import Head from 'next/head'
-
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 
 const TakeUmbrellaScreen = (props) => {
+  const router = useRouter();
+    const [countdown, setCountdown] = useState(10);
+  
+    useEffect(() => {
+      // カウントダウンタイマー
+      const timer = setInterval(() => {
+        setCountdown((prev) => {
+          if (prev <= 1) {
+            clearInterval(timer);
+            router.push('/1'); // 最初の画面に戻る
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+  
+      // コンポーネントがアンマウントされる時にタイマーをクリア
+      return () => clearInterval(timer);
+    }, [router]);
   return (
     <>
       <div className="take-umbrella-screen-container">
