@@ -10,7 +10,8 @@ const StandbyScreen = (props) => {
     // APIを呼び出してPythonスクリプトを実行
     const runPythonScript = async () => {
       try {
-        console.log('Pythonスクリプトを実行中...');
+        console.log('クライアント: API呼び出しを開始...');
+        
         const response = await fetch('/api/run-python', {
           method: 'POST',
           headers: {
@@ -18,20 +19,29 @@ const StandbyScreen = (props) => {
           },
         });
 
+        console.log('レスポンスを受信:', response.status, response.statusText);
+        
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
         const data = await response.json();
+        console.log('受信データ:', data);
         
         if (data.success && data.studentID && data.studentID.length > 0) {
-          console.log(data.studentID);
-            router.push({
-            pathname: '/2',
-            query: { studentID: data.studentID }
-            });
+          console.log('成功: 学生番号:', data.studentID);
+          console.log('/2ページに遷移します...');
+          const studentID = data.studentID[0]; // 配列の最初の要素を取得
+          router.push(`/2?studentID=${studentID}`);
         } else {
-          console.error('学生番号が取得できませんでした。');
+          console.error('失敗: 学生番号が取得できませんでした。');
+          console.log('/8ページに遷移します...');
           router.push('/8');
         }
       } catch (error) {
         console.error('APIエラー:', error);
+        console.log('エラーのため/8ページに遷移します...');
+        router.push('/8');
       }
     };
 
