@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Parashare - 認証成功</title>
+    {% load static %}
+    
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@100;200;300;400;500;600;700;800;900&display=swap" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" />
+    
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Noto Sans JP', sans-serif;
+        }
+        
+        .login-success-screen-container {
+            width: 100%;
+            display: flex;
+            overflow: auto;
+            min-height: 100vh;
+            align-items: center;
+            flex-direction: column;
+        }
+        
+        .login-success-screen-login-success-screen {
+            width: 100%;
+            height: auto;
+            display: flex;
+            padding: 40px;
+            align-items: center;
+            flex-shrink: 0;
+            flex-direction: column;
+            justify-content: center;
+            background-color: rgba(248, 249, 250, 1);
+        }
+        
+        .login-success-screen-success-content {
+            gap: 40px;
+            width: 600px;
+            height: 480px;
+            display: flex;
+            position: relative;
+            align-items: center;
+            flex-shrink: 0;
+        }
+        
+        .login-success-screen-success-icon {
+            top: -23px;
+            left: 220px;
+            width: 160px;
+            height: 160px;
+            display: flex;
+            position: absolute;
+            align-items: center;
+            flex-shrink: 0;
+            border-radius: 80px;
+            justify-content: center;
+            background-color: rgba(40, 167, 69, 1);
+        }
+        
+        .login-success-screen-check {
+            top: 50px;
+            left: 50px;
+            width: 60px;
+            height: 60px;
+            position: absolute;
+        }
+        
+        .login-success-screen-success-card {
+            top: 253px;
+            left: 30px;
+            width: 540px;
+            height: 257px;
+            display: flex;
+            padding: 40px;
+            position: absolute;
+            box-shadow: 0px 4px 20px 0px rgba(0, 0, 0, 0.06);
+            align-items: center;
+            flex-shrink: 0;
+            border-radius: 24px;
+            justify-content: center;
+            background-color: rgba(255, 255, 255, 1);
+        }
+        
+        .login-success-screen-card-content {
+            gap: 32px;
+            top: -10px;
+            left: 110px;
+            width: 320px;
+            height: 244px;
+            display: flex;
+            position: absolute;
+            align-items: center;
+            flex-shrink: 0;
+        }
+        
+        .login-success-screen-student-info {
+            gap: 16px;
+            top: 40px;
+            left: 53px;
+            width: 213px;
+            height: 82px;
+            display: flex;
+            position: absolute;
+            align-items: center;
+            flex-shrink: 0;
+        }
+        
+        .login-success-screen-text1 {
+            left: 59px;
+            color: rgba(102, 102, 102, 1);
+            height: auto;
+            position: absolute;
+            font-size: 24px;
+            text-align: left;
+            font-family: 'Noto Sans JP';
+            font-weight: 500;
+            line-height: 21.6px;
+            text-decoration: none;
+        }
+        
+        .login-success-screen-text2 {
+            top: 100px;
+            left: 18px;
+            color: rgba(184, 28, 34, 1);
+            height: auto;
+            position: absolute;
+            font-size: 48px;
+            text-align: center;
+            font-family: 'Noto Sans JP';
+            font-weight: 700;
+            line-height: 43.2px;
+            text-decoration: none;
+        }
+        
+        .login-success-screen-next-button {
+            top: 180px;
+            left: 0px;
+            width: 320px;
+            height: 64px;
+            display: flex;
+            position: absolute;
+            align-items: center;
+            flex-shrink: 0;
+            border-radius: 32px;
+            flex-direction: column;
+            justify-content: center;
+            background-color: rgba(0, 91, 172, 1);
+            border: none;
+            cursor: pointer;
+        }
+        
+        .login-success-screen-text3 {
+            color: rgba(255, 255, 255, 1);
+            height: auto;
+            font-size: 20px;
+            text-align: left;
+            font-family: 'Noto Sans JP';
+            font-weight: 900;
+            line-height: 24px;
+            text-decoration: none;
+        }
+        
+        .login-success-screen-text4 {
+            top: 176px;
+            left: 220px;
+            color: rgba(40, 167, 69, 1);
+            height: auto;
+            position: absolute;
+            font-size: 40px;
+            text-align: left;
+            font-family: 'Noto Sans JP';
+            font-weight: 700;
+            line-height: 33.6px;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-success-screen-container">
+        <div class="login-success-screen-login-success-screen">
+            <div class="login-success-screen-success-content">
+                <div class="login-success-screen-success-icon">
+                    <img
+                        src="{% static 'images/check.svg' %}"
+                        alt="Check"
+                        class="login-success-screen-check"
+                    />
+                </div>
+                
+                <span class="login-success-screen-text4">認証成功</span>
+                
+                <div class="login-success-screen-success-card">
+                    <div class="login-success-screen-card-content">
+                        <div class="login-success-screen-student-info">
+                            <span class="login-success-screen-text1">学生番号</span>
+                        </div>
+                        <span class="login-success-screen-text2" id="student-id">t323</span>
+                        <button class="login-success-screen-next-button" onclick="goToNext()">
+                            <span class="login-success-screen-text3">次へ進む</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // URLパラメータから学生IDを取得
+        const urlParams = new URLSearchParams(window.location.search);
+        const studentID = urlParams.get('studentID') || 't323';
+        document.getElementById('student-id').textContent = studentID;
+        
+        function goToNext() {
+            console.log('次へ進むボタンが押されました。3ページに遷移します...');
+            window.location.href = '/3/';
+        }
+    </script>
+</body>
+</html>
