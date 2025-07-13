@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Parashare - ご利用ありがとうございました</title>
+    {% load static %}
     
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@100;200;300;400;500;600;700;800;900&display=swap" />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" />
@@ -165,7 +166,7 @@
         
         .completion-screen-reminder {
             gap: 12px;
-            top: 171.5px;
+            top: 162px;
             left: 64px;
             width: 272px;
             display: flex;
@@ -220,7 +221,7 @@
             <div class="completion-screen-completion-content">
                 <div class="completion-screen-success-icon">
                     <img
-                        src="external/circle-check-big.svg"
+                        src="{% static 'images/circle-check-big.svg' %}"
                         alt="Check Circle"
                         class="completion-screen-check-circle"
                     />
@@ -269,7 +270,7 @@
             
             if (countdown <= 0) {
                 console.log('カウントダウン終了。1ページに遷移します...');
-                window.location.href = '1.html';
+                window.location.href = '/1/';
                 return;
             }
             

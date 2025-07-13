@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Parashare - 認証エラー</title>
+    {% load static %}
+    
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@100;200;300;400;500;600;700;800;900&display=swap" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" />
+    
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Noto Sans JP', sans-serif;
+        }
+        
+        .auth-error-screen-container {
+            width: 100%;
+            display: flex;
+            overflow: auto;
+            min-height: 100vh;
+            align-items: center;
+            flex-direction: column;
+        }
+        
+        .auth-error-screen-auth-error-screen {
+            width: 100%;
+            height: 600px;
+            display: flex;
+            position: relative;
+            align-items: center;
+            flex-shrink: 0;
+            justify-content: center;
+            background-color: rgba(230, 0, 32, 1);
+        }
+        
+        .auth-error-screen-error-icon {
+            top: 62px;
+            width: 140px;
+            height: 140px;
+            display: flex;
+            position: absolute;
+            align-items: center;
+            flex-shrink: 0;
+            border-radius: 70px;
+            justify-content: center;
+            background-color: rgba(255, 255, 255, 1);
+        }
+        
+        .auth-error-screen-alert-triangle {
+            top: 40px;
+            left: 40px;
+            width: 60px;
+            height: 60px;
+            position: absolute;
+        }
+        
+        .auth-error-screen-error-content {
+            gap: 40px;
+            top: 285px;
+            width: 600px;
+            height: 328px;
+            display: flex;
+            position: absolute;
+            align-items: center;
+            flex-shrink: 0;
+        }
+        
+        .auth-error-screen-error-card {
+            gap: 37px;
+            top: -32px;
+            left: 60px;
+            width: 480px;
+            height: 312px;
+            display: flex;
+            padding: 58px 40px 40px;
+            position: absolute;
+            align-items: center;
+            flex-shrink: 0;
+            border-radius: 24px;
+            justify-content: center;
+            background-color: rgba(255, 255, 255, 1);
+        }
+        
+        .auth-error-screen-card-content {
+            gap: 32px;
+            top: 38px;
+            left: 100.5px;
+            width: 279px;
+            height: 222px;
+            display: flex;
+            position: absolute;
+            align-items: center;
+            flex-shrink: 0;
+        }
+        
+        .auth-error-screen-text1 {
+            left: 67.5px;
+            top: 0;
+            color: rgba(230, 0, 32, 1);
+            height: auto;
+            position: absolute;
+            font-size: 32px;
+            text-align: left;
+            font-family: 'Noto Sans JP';
+            font-weight: 700;
+            line-height: 33.6px;
+            text-decoration: none;
+        }
+        
+        .auth-error-screen-error-message {
+            gap: 16px;
+            top: 66px;
+            left: 0px;
+            width: 279px;
+            height: 60px;
+            display: flex;
+            position: absolute;
+            align-items: center;
+            flex-shrink: 0;
+        }
+        
+        .auth-error-screen-text2 {
+            top: 10px;
+            left: -0.5px;
+            color: rgba(51, 51, 51, 1);
+            height: auto;
+            position: absolute;
+            font-size: 20px;
+            text-align: center;
+            font-family: 'Noto Sans JP';
+            font-weight: 900;
+            line-height: 24px;
+            text-decoration: none;
+        }
+        
+        .auth-error-screen-text3 {
+            top: 126px;
+            left: 51.5px;
+            color: rgba(102, 102, 102, 1);
+            height: auto;
+            position: absolute;
+            font-size: 16px;
+            text-align: center;
+            font-family: 'Noto Sans JP';
+            font-weight: 500;
+            line-height: 19.2px;
+            text-decoration: none;
+        }
+        
+        .auth-error-screen-retry-button {
+            top: 190px;
+            left: 19.5px;
+            width: 240px;
+            height: 64px;
+            display: flex;
+            position: absolute;
+            align-items: center;
+            flex-shrink: 0;
+            border-radius: 32px;
+            justify-content: center;
+            background-color: rgba(230, 0, 32, 1);
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+        
+        .auth-error-screen-retry-button:hover {
+            background-color: rgba(200, 0, 28, 1);
+        }
+        
+        .auth-error-screen-button-content {
+            gap: 12px;
+            top: 21px;
+            left: 77px;
+            width: 86px;
+            display: flex;
+            position: absolute;
+            align-items: center;
+            pointer-events: none;
+        }
+        
+        .auth-error-screen-refresh-cw {
+            width: 20px;
+            height: 20px;
+        }
+        
+        .auth-error-screen-text4 {
+            color: rgba(255, 255, 255, 1);
+            height: auto;
+            font-size: 18px;
+            text-align: left;
+            font-family: 'Noto Sans JP';
+            white-space: nowrap;
+            font-weight: 900;
+            line-height: 21.6px;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="auth-error-screen-container">
+        <div class="auth-error-screen-auth-error-screen">
+            <div class="auth-error-screen-error-icon">
+                <img
+                    src="{% static 'images/triangle-alert.svg' %}"
+                    alt="Alert Triangle"
+                    class="auth-error-screen-alert-triangle"
+                />
+            </div>
+            
+            <div class="auth-error-screen-error-content">
+                <div class="auth-error-screen-error-card">
+                    <div class="auth-error-screen-card-content">
+                        <span class="auth-error-screen-text1">認証エラー</span>
+                        
+                        <div class="auth-error-screen-error-message">
+                            <span class="auth-error-screen-text2">
+                                学生証を確認できませんでした
+                            </span>
+                        </div>
+                        
+                        <span class="auth-error-screen-text3">
+                            もう一度お試しください
+                        </span>
+                        
+                        <button class="auth-error-screen-retry-button" onclick="handleRetry()">
+                            <div class="auth-error-screen-button-content">
+                                <img
+                                    src="{% static 'images/refresh-cw.svg' %}"
+                                    alt="Refresh"
+                                    class="auth-error-screen-refresh-cw"
+                                />
+                                <span class="auth-error-screen-text4">再試行</span>
+                            </div>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function handleRetry() {
+            console.log('再試行ボタンが押されました。/1ページに遷移します...');
+            window.location.href = '/1/';
+        }
+    </script>
+</body>
+</html>
