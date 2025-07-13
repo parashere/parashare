@@ -1,5 +1,6 @@
 from django.urls import path
 from . import views
+from .nfc_reader import read_nfc_tag
 
 urlpatterns = [
     path('', views.page0, name='home'),  # ルートURLでページ0を表示
@@ -13,4 +14,5 @@ urlpatterns = [
     path('7/', views.page7, name='page7'),
     path('8/', views.page8, name='page8'),
     path('9/', views.page9, name='page9'),
+    path('api/nfc-read/', read_nfc_tag, name='nfc_read'),  # NFC読み取りAPI
 ]

@@ -1,5 +1,6 @@
 from django.shortcuts import render
 from django.http import HttpResponse
+from .nfc_reader import read_nfc_tag
 
 def startup(request):
     """立ち上げ中画面を表示"""

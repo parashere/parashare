@@ -220,14 +220,57 @@
     </div>
 
     <script>
-        // 3秒後に自動で次のページに遷移（元のAPIコールの代わり）
-        setTimeout(() => {
-            console.log('学生証認証成功。2ページに遷移します...');
-            // 実際の実装では、ここでNFC読み取り処理を行う
-            const studentID = 't323'; // デモ用の学生ID
-            window.location.href = `/2/?studentID=${studentID}`;
-        }, 3000);
-        // NFCスクリプトの実行をシミュレート
+        let isReading = false;
+        
+        function startNFCReading() {
+            if (isReading) return;
+            
+            isReading = true;
+            console.log('NFC読み取りを開始します...');
+            
+            // APIでNFC読み取りを開始
+            fetch('/api/nfc-read/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({})
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success && data.student_id) {
+                    console.log('学生証認証成功:', data.student_id);
+                    window.location.href = `/2/?studentID=${data.student_id}`;
+                } else {
+                    console.error('NFC読み取りエラー:', data.error);
+                    // エラー時は3秒後にデモ用IDで遷移
+                    setTimeout(() => {
+                        const studentID = 't323'; // デモ用の学生ID
+                        window.location.href = `/2/?studentID=${studentID}`;
+                    }, 3000);
+                }
+            })
+            .catch(error => {
+                console.error('API呼び出しエラー:', error);
+                // エラー時は3秒後にデモ用IDで遷移
+                setTimeout(() => {
+                    const studentID = 't323'; // デモ用の学生ID
+                    window.location.href = `/2/?studentID=${studentID}`;
+                }, 3000);
+            })
+            .finally(() => {
+                isReading = false;
+            });
+        }
+        
+        // ページ読み込み後にNFC読み取りを開始
+        window.addEventListener('load', () => {
+            setTimeout(startNFCReading, 1000); // 1秒後に開始
+        });
+        
+        // タッチ/クリックでも読み取り開始
+        document.addEventListener('click', startNFCReading);
+        document.addEventListener('touchstart', startNFCReading);
     </script>
 </body>
 </html>
