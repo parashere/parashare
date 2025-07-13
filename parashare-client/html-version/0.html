@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Parashare - 立ち上げ中</title>
+    
+    <style>
+        html {
+            line-height: 1.15;
+            scroll-behavior: smooth;
+            font-family: Inter;
+            font-size: 16px;
+        }
+        
+        body {
+            margin: 0;
+            font-weight: 400;
+            font-style: normal;
+            text-decoration: none;
+            text-transform: none;
+            letter-spacing: normal;
+            line-height: 1.15;
+            color: var(--dl-color-theme-neutral-dark);
+            background: var(--dl-color-theme-neutral-light);
+            fill: var(--dl-color-theme-neutral-dark);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+        }
+        
+        .container {
+            text-align: center;
+            font-size: 1.5rem;
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <p>立ち上げ中です 自動的に遷移します</p>
+    </div>
+
+    <script>
+        // 1秒後に自動的にstandby.htmlページに移動
+        setTimeout(function() {
+            window.location.href = 'standby.html';
+        }, 1000);
+    </script>
+</body>
+</html>
