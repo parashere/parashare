@@ -245,18 +245,17 @@
                     console.error('NFC読み取りエラー:', data.error);
                     // エラー時は3秒後にデモ用IDで遷移
                     setTimeout(() => {
-                        const studentID = 't323'; // デモ用の学生ID
-                        window.location.href = `/2/?studentID=${studentID}`;
-                    }, 3000);
+                        window.location.href = `/8/`;
+                    }, 1000);
                 }
             })
             .catch(error => {
                 console.error('API呼び出しエラー:', error);
                 // エラー時は3秒後にデモ用IDで遷移
                 setTimeout(() => {
-                    const studentID = 't323'; // デモ用の学生ID
-                    window.location.href = `/2/?studentID=${studentID}`;
-                }, 3000);
+                    const studentID = ''; // デモ用の学生ID
+                    window.location.href = `/8/`;
+                }, 1000);
             })
             .finally(() => {
                 isReading = false;
