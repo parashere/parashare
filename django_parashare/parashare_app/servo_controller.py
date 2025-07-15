@@ -1,4 +1,6 @@
 from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_http_methods
 import json
 import logging
 
@@ -74,43 +76,85 @@ class ServoController:
 # グローバルなサーボコントローラーインスタンス
 servo_controller = ServoController()
 
+@csrf_exempt
+@require_http_methods(["GET", "POST"])
 def open_gate_api(request):
     """ゲートを開くAPI"""
+    # CORS対応
+    response_data = {}
+    
     if request.method == 'POST':
         try:
             success = servo_controller.open_gate()
-            return JsonResponse({
+            response_data = {
                 'success': success,
                 'message': 'ゲートを開きました' if success else 'ゲートの開放に失敗しました',
-                'status': servo_controller.get_status()
-            })
+                'status': servo_controller.get_status(),
+                'method': 'POST'
+            }
         except Exception as e:
-            return JsonResponse({
+            response_data = {
                 'success': False,
                 'message': f'エラーが発生しました: {str(e)}',
-                'status': servo_controller.get_status()
-            }, status=500)
-    else:
-        return JsonResponse({'error': 'POST method required'}, status=405)
+                'status': servo_controller.get_status(),
+                'method': 'POST'
+            }
+            return JsonResponse(response_data, status=500)
+    elif request.method == 'GET':
+        # GETでの疎通テスト
+        response_data = {
+            'success': True,
+            'message': 'Servo open API is working',
+            'method': 'GET',
+            'status': servo_controller.get_status()
+        }
+    
+    response = JsonResponse(response_data)
+    # CORS対応ヘッダーを追加
+    response['Access-Control-Allow-Origin'] = '*'
+    response['Access-Control-Allow-Methods'] = 'GET, POST'
+    response['Access-Control-Allow-Headers'] = 'Content-Type'
+    return response
 
+@csrf_exempt
+@require_http_methods(["GET", "POST"])
 def close_gate_api(request):
     """ゲートを閉じるAPI"""
+    # CORS対応
+    response_data = {}
+    
     if request.method == 'POST':
         try:
             success = servo_controller.close_gate()
-            return JsonResponse({
+            response_data = {
                 'success': success,
                 'message': 'ゲートを閉じました' if success else 'ゲートの閉鎖に失敗しました',
-                'status': servo_controller.get_status()
-            })
+                'status': servo_controller.get_status(),
+                'method': 'POST'
+            }
         except Exception as e:
-            return JsonResponse({
+            response_data = {
                 'success': False,
                 'message': f'エラーが発生しました: {str(e)}',
-                'status': servo_controller.get_status()
-            }, status=500)
-    else:
-        return JsonResponse({'error': 'POST method required'}, status=405)
+                'status': servo_controller.get_status(),
+                'method': 'POST'
+            }
+            return JsonResponse(response_data, status=500)
+    elif request.method == 'GET':
+        # GETでの疎通テスト
+        response_data = {
+            'success': True,
+            'message': 'Servo close API is working',
+            'method': 'GET',
+            'status': servo_controller.get_status()
+        }
+    
+    response = JsonResponse(response_data)
+    # CORS対応ヘッダーを追加
+    response['Access-Control-Allow-Origin'] = '*'
+    response['Access-Control-Allow-Methods'] = 'GET, POST'
+    response['Access-Control-Allow-Headers'] = 'Content-Type'
+    return response
 
 def gate_status_api(request):
     """ゲートの状態を取得するAPI"""

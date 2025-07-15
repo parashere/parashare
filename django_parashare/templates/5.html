@@ -239,40 +239,41 @@
     <script>
         let countdown = 10;
         
-        // ゲートを閉じる
+        // シンプルなゲート閉鎖関数
         async function closeGate() {
             try {
                 console.log('ゲート閉鎖を試行中...');
+                
                 const response = await fetch('/api/servo/close/', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    }
+                    method: 'POST'
                 });
                 
                 console.log('Response status:', response.status);
+                console.log('Response OK:', response.ok);
                 
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                
-                const contentType = response.headers.get('content-type');
-                if (!contentType || !contentType.includes('application/json')) {
-                    const text = await response.text();
-                    console.error('Expected JSON but got:', text.substring(0, 200));
-                    throw new Error('Expected JSON response but got HTML');
-                }
-                
-                const data = await response.json();
-                if (data.success) {
-                    console.log('ゲートを閉じました:', data.message);
+                if (response.ok) {
+                    try {
+                        const data = await response.json();
+                        console.log('Response data:', data);
+                        
+                        if (data.success) {
+                            console.log('✓ ゲートを閉じました:', data.message);
+                        } else {
+                            console.log('⚠ ゲートの閉鎖に失敗:', data.message);
+                        }
+                    } catch (jsonError) {
+                        console.log('JSON parse error, trying as text...');
+                        const text = await response.text();
+                        console.log('Response as text:', text.substring(0, 100));
+                    }
                 } else {
-                    console.error('ゲートの閉鎖に失敗:', data.message);
+                    console.error('❌ HTTP Error:', response.status);
+                    const text = await response.text();
+                    console.error('Error response:', text.substring(0, 200));
                 }
             } catch (error) {
-                console.error('ゲート制御エラー:', error);
-                // エラーが発生してもページは続行
-                console.log('エラーが発生しましたが、処理を続行します');
+                console.error('❌ Network/Fetch error:', error);
+                console.log('処理を続行します...');
             }
         }
         
@@ -291,6 +292,7 @@
         
         // ページ読み込み時にゲートを閉じる
         window.addEventListener('load', () => {
+            console.log('ページ読み込み完了、ゲート閉鎖開始');
             closeGate();
         });
         
