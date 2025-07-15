@@ -239,32 +239,29 @@
     <script>
         let countdown = 10;
         
-        // CSRFトークンを取得する関数
-        function getCookie(name) {
-            let cookieValue = null;
-            if (document.cookie && document.cookie !== '') {
-                const cookies = document.cookie.split(';');
-                for (let i = 0; i < cookies.length; i++) {
-                    const cookie = cookies[i].trim();
-                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                        break;
-                    }
-                }
-            }
-            return cookieValue;
-        }
-        
         // ゲートを閉じる
         async function closeGate() {
             try {
+                console.log('ゲート閉鎖を試行中...');
                 const response = await fetch('/api/servo/close/', {
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRFToken': getCookie('csrftoken')
+                        'Content-Type': 'application/json'
                     }
                 });
+                
+                console.log('Response status:', response.status);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const contentType = response.headers.get('content-type');
+                if (!contentType || !contentType.includes('application/json')) {
+                    const text = await response.text();
+                    console.error('Expected JSON but got:', text.substring(0, 200));
+                    throw new Error('Expected JSON response but got HTML');
+                }
                 
                 const data = await response.json();
                 if (data.success) {
@@ -274,6 +271,8 @@
                 }
             } catch (error) {
                 console.error('ゲート制御エラー:', error);
+                // エラーが発生してもページは続行
+                console.log('エラーが発生しましたが、処理を続行します');
             }
         }
         
