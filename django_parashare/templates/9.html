@@ -98,7 +98,25 @@
     </div>
 
     <script>
-         // ページ読み込み時にゲートを開く
+        let gateOpened = false;
+        
+        // CSRFトークンを取得する関数
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+        
+        // ページ読み込み時にゲートを開く
         async function openGate() {
             try {
                 const response = await fetch('/api/servo/open/', {
@@ -120,17 +138,17 @@
                 console.error('ゲート制御エラー:', error);
             }
         }
-        // 10秒後に1ページに遷移
-        setTimeout(() => {
-            console.log('待機時間終了。1ページに遷移します...');
-            window.location.href = '/5/';
-        }, 10000);
         
+        // ページ読み込み時にゲートを開く
         window.addEventListener('load', () => {
             openGate();
         });
         
-
+        // 3秒後に5ページに遷移
+        setTimeout(() => {
+            console.log('処理完了。5ページに遷移します...');
+            window.location.href = '/5/';
+        }, 3000);
     </script>
 </body>
 </html>

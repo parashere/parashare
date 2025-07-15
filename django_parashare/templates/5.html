@@ -238,9 +238,22 @@
 
     <script>
         let countdown = 10;
-        let gateOpened = false;
         
-       
+        // CSRFトークンを取得する関数
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
         
         // ゲートを閉じる
         async function closeGate() {
@@ -264,52 +277,30 @@
             }
         }
         
-        // CSRFトークンを取得する関数
-        function getCookie(name) {
-            let cookieValue = null;
-            if (document.cookie && document.cookie !== '') {
-                const cookies = document.cookie.split(';');
-                for (let i = 0; i < cookies.length; i++) {
-                    const cookie = cookies[i].trim();
-                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                        break;
-                    }
-                }
-            }
-            return cookieValue;
-        }
-        
         function updateCountdown() {
             const countdownElement = document.getElementById('countdown-timer');
             countdownElement.textContent = countdown;
             
             if (countdown <= 0) {
-                // カウントダウン終了時にゲートを閉じてから遷移
-                console.log('カウントダウン終了。ゲートを閉じて1ページに遷移します...');
-                closeGate().then(() => {
-                    setTimeout(() => {
-                        window.location.href = '/1/';
-                    }, 1000); // ゲートが閉じるまで少し待機
-                });
+                console.log('カウントダウン終了。1ページに遷移します...');
+                window.location.href = '/1/';
                 return;
             }
             
             countdown--;
         }
         
-        
+        // ページ読み込み時にゲートを閉じる
+        window.addEventListener('load', () => {
+            closeGate();
+        });
         
         // 1秒ごとにカウントダウンを更新
         const timer = setInterval(updateCountdown, 1000);
         
-        // ページが離れる時にタイマーをクリアし、ゲートを閉じる
+        // ページが離れる時にタイマーをクリア
         window.addEventListener('beforeunload', () => {
             clearInterval(timer);
-            if (gateOpened) {
-                // 非同期だが、ベストエフォートでゲートを閉じる
-                closeGate();
-            }
         });
     </script>
 </body>
