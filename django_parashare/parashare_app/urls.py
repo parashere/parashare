@@ -1,6 +1,7 @@
 from django.urls import path
 from . import views
 from .nfc_reader import read_nfc_tag
+from .servo_controller import open_gate_api, close_gate_api, gate_status_api
 
 urlpatterns = [
     path('', views.page0, name='home'),  # ルートURLでページ0を表示
@@ -14,5 +15,9 @@ urlpatterns = [
     path('7/', views.page7, name='page7'),
     path('8/', views.page8, name='page8'),
     path('9/', views.page9, name='page9'),
+    path('servo-test/', views.servo_test, name='servo_test'),  # サーボテストページ
     path('api/nfc-read/', read_nfc_tag, name='nfc_read'),  # NFC読み取りAPI
+    path('api/servo/open/', open_gate_api, name='servo_open'),  # ゲートを開くAPI
+    path('api/servo/close/', close_gate_api, name='servo_close'),  # ゲートを閉じるAPI
+    path('api/servo/status/', gate_status_api, name='servo_status'),  # ゲート状態API
 ]

@@ -98,11 +98,39 @@
     </div>
 
     <script>
+         // ページ読み込み時にゲートを開く
+        async function openGate() {
+            try {
+                const response = await fetch('/api/servo/open/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': getCookie('csrftoken')
+                    }
+                });
+                
+                const data = await response.json();
+                if (data.success) {
+                    console.log('ゲートを開きました:', data.message);
+                    gateOpened = true;
+                } else {
+                    console.error('ゲートの開放に失敗:', data.message);
+                }
+            } catch (error) {
+                console.error('ゲート制御エラー:', error);
+            }
+        }
         // 10秒後に1ページに遷移
         setTimeout(() => {
             console.log('待機時間終了。1ページに遷移します...');
             window.location.href = '/5/';
         }, 10000);
+        
+        window.addEventListener('load', () => {
+            openGate();
+        });
+        
+
     </script>
 </body>
 </html>
