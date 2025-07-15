@@ -88,6 +88,7 @@
             <button class="button open-btn" onclick="openGate()">ゲートを開く</button>
             <button class="button close-btn" onclick="closeGate()">ゲートを閉じる</button>
             <button class="button status-btn" onclick="getStatus()">状態確認</button>
+            <button class="button status-btn" onclick="testServo()">サーボテスト</button>
         </div>
         
         <div id="result" class="result">
@@ -176,10 +177,30 @@
                         ゲート状態: ${status.is_open ? '開' : '閉'}
                         サーボ利用可能: ${status.servo_available ? 'はい' : 'いいえ'}
                         サーボ初期化済み: ${status.servo_initialized ? 'はい' : 'いいえ'}
+                        ピン番号: ${status.pin}
+                        現在の値: ${status.current_value ?? 'N/A'}
                     `;
                     showResult(statusText, true);
                 } else {
                     showResult('状態の取得に失敗しました', false);
+                }
+            } catch (error) {
+                showResult(`エラー: ${error.message}`, false);
+            }
+        }
+        
+        async function testServo() {
+            try {
+                showResult('サーボテストを実行しています...', true);
+                const response = await fetch('/api/servo/test/', {
+                    method: 'POST'
+                });
+                
+                const data = await response.json();
+                if (data.success) {
+                    showResult(`テスト成功: ${data.message}`, true);
+                } else {
+                    showResult(`テスト失敗: ${data.message}`, false);
                 }
             } catch (error) {
                 showResult(`エラー: ${error.message}`, false);
