@@ -5,11 +5,6 @@ BASE_URL = "http://localhost:8000"  # 本番では実際のAPIサーバーURLに
 student_id = "t323088"  # NFCなどから取得した学籍番号
 endpoint = f"{BASE_URL}/students/{student_id}/auth"
 
-# 認証 or 登録リクエストの内容
-payload = {
-    "stand_id": "01",  # スタンドID (UUID)
-}
-
 # ヘッダー（今回は署名なしなので最低限）
 headers = {
     "Content-Type": "application/json"
