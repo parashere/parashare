@@ -1,43 +1,71 @@
 import requests
+import json
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_http_methods
 
-def send_server_nfc(student_id):
+@csrf_exempt
+@require_http_methods(["POST"])
+def send_server_nfc(request):
     """
-    NFCタグから学籍番号を取得し、サーバーに認証リクエストを送信する関数。
+    NFCリクエストを処理する関数。
+    フロントエンドの /api/nfc-request/ エンドポイント用。
     """
-    # ======== リクエスト設定 ========
-    BASE_URL = "http://localhost:8000"  # 本番では実際のAPIサーバーURLに変更
-    student_id = "t323088"  # NFCなどから取得した学籍番号
-    endpoint = f"{BASE_URL}/students/{student_id}/auth"
-
-    # 認証 or 登録リクエストの内容
-    payload = {
-        "stand_id": "01",  # スタンドID (UUID)
-    }
-
-    # ヘッダー（今回は署名なしなので最低限）
-    headers = {
-        "Content-Type": "application/json"
-    }
-
-    # ======== リクエスト送信 ========
     try:
-        response = requests.post(endpoint, headers=headers, timeout=5)
+        # リクエストボディから学生IDを取得
+        data = json.loads(request.body)
+        student_id = data.get('student_id')
+        
+        if not student_id:
+            return JsonResponse({
+                'success': False,
+                'error': '学生IDが指定されていません'
+            }, status=400)
+        
+        # ======== 外部サーバーへのリクエスト設定 ========
+        BASE_URL = "http://localhost:8000"  # 本番では実際のAPIサーバーURLに変更
+        endpoint = f"{BASE_URL}/students/{student_id}/auth"
+
+        # ヘッダー
+        headers = {
+            "Content-Type": "application/json"
+        }
+
+        # ======== 外部サーバーへリクエスト送信 ========
+        response = requests.post(endpoint, headers=headers, timeout=10)
         response.raise_for_status()
 
-        # 結果表示
-        data = response.json()
-        status_code = response.status_code
-        message = data.get("message", "")
-        student_data = data.get("data", {})
-
-        print(f"{status_code} ok:", message, student_data)
+        # 成功レスポンス
+        server_data = response.json()
+        
+        return JsonResponse({
+            'success': True,
+            'message': 'NFCリクエスト送信完了',
+            'student_id': student_id,
+            'server_response': server_data
+        })
 
     except requests.exceptions.HTTPError as e:
-        print("HTTPエラー:", e)
-        print("レスポンス:", response.text)
+        return JsonResponse({
+            'success': False,
+            'error': f'サーバーエラー: {e}',
+            'details': response.text if 'response' in locals() else None
+        }, status=500)
 
     except requests.exceptions.RequestException as e:
-        print("通信エラー:", e)
+        return JsonResponse({
+            'success': False,
+            'error': f'通信エラー: {e}'
+        }, status=500)
+
+    except json.JSONDecodeError:
+        return JsonResponse({
+            'success': False,
+            'error': '無効なJSONデータです'
+        }, status=400)
 
     except Exception as e:
-        print("その他のエラー:", e)
+        return JsonResponse({
+            'success': False,
+            'error': f'予期しないエラー: {e}'
+        }, status=500)
