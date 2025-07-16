@@ -1,6 +1,8 @@
 import requests
 
-BASE_URL = "http://localhost:8000"
+#BASE_URL = "http://localhost:8000"
+BASE_URL = "http://150.42.11.227:8000/"
+
 rfid = "RFID001"
 endpoint = f"{BASE_URL}/parasols/{rfid}/rent"
 
