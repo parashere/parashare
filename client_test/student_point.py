@@ -1,25 +1,39 @@
 import requests
 
-# 固定設定
-BASE_URL = "http://your-api-host.com"  # 本番環境なら適宜変更
-student_id = "abc12345"  # NFCなどで読み取った学籍番号
+# ======== 設定 ========
+BASE_URL = "http://localhost:8000"  # 本番では実際のAPIサーバーURLに変更
+student_id = "t323088"  # NFCなどから取得した学籍番号
 endpoint = f"{BASE_URL}/students/{student_id}/auth"
 
-# 認証または登録リクエストボディ
+# 認証 or 登録リクエストの内容
 payload = {
-    "stand_id": "123e4567-e89b-12d3-a456-426614174000",  # 傘スタンドUUID
-    "mode": "auth"  # または "register"
+    "stand_id": "01",  # スタンドID (UUID)
 }
 
-# リクエスト送信
-try:
-    response = requests.post(endpoint, json=payload, timeout=5)
-    response.raise_for_status()  # 200系以外を例外に
+# ヘッダー（今回は署名なしなので最低限）
+headers = {
+    "Content-Type": "application/json"
+}
 
+# ======== リクエスト送信 ========
+try:
+    response = requests.post(endpoint, headers=headers, timeout=5)
+    response.raise_for_status()
+
+    # 結果表示
     data = response.json()
-    print("✅ 認証結果:", data["data"])  # 例: {"registered": true, "student_name": "山田太郎"}
-except requests.exceptions.HTTPError as http_err:
-    print("❌ HTTPエラー:", http_err)
-    print("詳細:", response.json())
-except requests.exceptions.RequestException as err:
-    print("❌ 通信エラー:", err)
+    status_code = response.status_code
+    message = data.get("message", "")
+    student_data = data.get("data", {})
+
+    print(f"{status_code} ok:", message, student_data)
+
+except requests.exceptions.HTTPError as e:
+    print("HTTPエラー:", e)
+    print("レスポンス:", response.text)
+
+except requests.exceptions.RequestException as e:
+    print("通信エラー:", e)
+
+except Exception as e:
+    print("その他のエラー:", e)
