@@ -21,7 +21,6 @@ CREATE TABLE "parasol" (
 CREATE TABLE "students" (
   "id" UUID DEFAULT gen_random_uuid() NOT NULL,
   "student_id" VARCHAR(16) UNIQUE NOT NULL,
-  "card_id" VARCHAR(32) UNIQUE NOT NULL,
   "created_at" TIMESTAMPTZ DEFAULT NOW(),
   "updated_at" TIMESTAMPTZ DEFAULT NOW(),
   PRIMARY KEY ("id")
