@@ -250,7 +250,8 @@
                     
                     try {
                         // 読み取り完了通知を送信（必ず完了を待つ）
-                        await sendCompletionNotification(nfcData.student_id);
+                        
+                       // await sendCompletionNotification(nfcData.student_id);
                         console.log('通知送信完了 - ページ遷移を開始');
                     } catch (notificationError) {
                         console.error('通知送信失敗:', notificationError);
@@ -277,9 +278,12 @@
                 isReading = false;
             }
         }
-        
+        /*
         // 読み取り完了通知を送信する関数
         async function sendCompletionNotification(studentId) {
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 5000); // 5秒でタイムアウト
+            
             try {
                 const response = await fetch('/api/nfc-request/', {
                     method: 'POST',
@@ -288,8 +292,11 @@
                     },
                     body: JSON.stringify({
                         student_id: studentId,
-                    })
+                    }),
+                    signal: controller.signal
                 });
+                
+                clearTimeout(timeoutId);
                 
                 if (!response.ok) {
                     throw new Error(`HTTP Error: ${response.status}`);
@@ -299,10 +306,17 @@
                 console.log('読み取り完了通知:', data);
                 return data;
             } catch (error) {
-                console.error('読み取り完了通知エラー:', error);
+                clearTimeout(timeoutId);
+                if (error.name === 'AbortError') {
+                    console.error('通知送信タイムアウト');
+                } else {
+                    console.error('読み取り完了通知エラー:', error);
+                }
                 throw error; // エラーを再スローして呼び出し元で処理
             }
+
         }
+        */
 
         // ページ読み込み後にNFC読み取りを開始
         window.addEventListener('load', () => {
