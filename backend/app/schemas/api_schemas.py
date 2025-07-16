@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, RootModel
 from typing import Optional, Literal, List
 from uuid import UUID
 from datetime import datetime
@@ -6,7 +6,7 @@ from datetime import datetime
 # 共通レスポンス（成功時）
 class CommonResponse(BaseModel):
     status: int = Field(..., example=200)
-    message: str = Field(..., example="成功")
+    message: str = Field(..., example="success")
     data: Optional[dict] = None  # 実際の中身はresponse_modelで上書き
 
 # エラーレスポンス（詳細つき）
@@ -17,13 +17,11 @@ class ErrorResponse(BaseModel):
 
 # 学生証リクエスト
 class StudentAuthRequest(BaseModel):
-    card_id: str = Field(..., description="スタンドで読み取ったNFCカードID", example="04A224B63C1E80")
-
-# 学生認証レスポンス
+    stand_id: str  # スタンドのID（例: ST01）
+    
 class StudentAuthData(BaseModel):
-    valid: bool = Field(..., description="カードIDが有効か", example=True)
-    student_id: Optional[str] = Field(..., description="UUID形式の学生ID", example="c7fb8b5e-3d03-4b2e-9e31-de2b1e6f2e7a")
-
+    valid: bool
+    student_id: str
 # ポイント情報
 class PointData(BaseModel):
     points: int = Field(..., example=350)
@@ -72,8 +70,8 @@ class RentalHistoryItem(BaseModel):
     returned_at: Optional[datetime]
 
 # 貸出履歴一覧
-class RentalHistoryData(BaseModel):
-    __root__: List[RentalHistoryItem]
+class RentalHistoryData(RootModel[list[RentalHistoryItem]]):
+    pass
 
 # 鍵開閉操作
 class LockOperationRequest(BaseModel):
