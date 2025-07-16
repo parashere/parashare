@@ -44,6 +44,10 @@ async def startup_event():
 @app.exception_handler(RequestValidationError)
 async def validation_exception_handler(request: Request, exc: RequestValidationError):
     return JSONResponse(
-        status_code=status.HTTP_400_BAD_REQUEST,
-        content=jsonable_encoder(ErrorResponse(detail="不正なリクエストです")),
+        status_code=400,
+        content=jsonable_encoder(ErrorResponse(
+            status=400,
+            error_code="invalid_request",
+            message="不正なリクエストです"
+        )),
     )
