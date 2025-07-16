@@ -13,7 +13,6 @@ router = APIRouter()
 @router.post("/students/{student_id}/auth", response_model=CommonResponse)
 async def auth_or_register_student(
     student_id: str = Path(..., description="学籍番号"),
-    request: StudentAuthRequest = ...,
     session: AsyncSession = Depends(get_async_session)
 ):
     # 学生情報を検索
