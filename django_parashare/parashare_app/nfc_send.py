@@ -1,12 +1,8 @@
 import requests
 import json
-import logging
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
-from django.conf import settings
-
-logger = logging.getLogger(__name__)
 
 @csrf_exempt
 @require_http_methods(["POST"])
@@ -27,25 +23,16 @@ def send_server_nfc(request):
             }, status=400)
         
         # ======== 外部サーバーへのリクエスト設定 ========
-        BASE_URL = getattr(settings, 'PARASHARE_API_URL', "http://chukyo-parashare.com:8000")
+        BASE_URL = "http://api.chukyo-parashare.com:8000"  # 本番では実際のAPIサーバーURLに変更
         endpoint = f"{BASE_URL}/students/{student_id}/auth"
 
         # ヘッダー
         headers = {
             "Content-Type": "application/json"
         }
-
-        # 学生IDのバリデーション（基本的なチェック）
-        if not str(student_id).isdigit() or len(str(student_id)) < 1:
-            return JsonResponse({
-                'success': False,
-                'error': '無効な学生IDです'
-            }, status=400)
-
-        # ======== 外部サーバーへリクエスト送信 ========
-        logger.info(f"NFCリクエスト送信: student_id={student_id}")
-        # 空のJSONオブジェクトを送信
         payload = {}
+        # ======== 外部サーバーへリクエスト送信 ========
+        print("sending NFC request to external server...")
         response = requests.post(endpoint, headers=headers, json=payload, timeout=10)
         response.raise_for_status()
 
@@ -60,16 +47,10 @@ def send_server_nfc(request):
         })
 
     except requests.exceptions.HTTPError as e:
-        error_details = None
-        try:
-            error_details = response.text if 'response' in locals() and response else None
-        except:
-            pass
-        
         return JsonResponse({
             'success': False,
             'error': f'サーバーエラー: {e}',
-            'details': error_details
+            'details': response.text if 'response' in locals() else None
         }, status=500)
 
     except requests.exceptions.RequestException as e:
@@ -85,8 +66,7 @@ def send_server_nfc(request):
         }, status=400)
 
     except Exception as e:
-        logger.error(f"予期しないエラー: {e}, student_id: {student_id if 'student_id' in locals() else 'unknown'}")
         return JsonResponse({
             'success': False,
-            'error': '内部サーバーエラーが発生しました'
+            'error': f'予期しないエラー: {e}'
         }, status=500)
