@@ -1,20 +1,23 @@
 <!DOCTYPE html>
 <html lang="ja">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Parashare - スタンバイ画面</title>
     {% load static %}
-    
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@100;200;300;400;500;600;700;800;900&display=swap" />
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" />
-    
+
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@100;200;300;400;500;600;700;800;900&display=swap" />
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" />
+
     <style>
         body {
             margin: 0;
             font-family: 'Noto Sans JP', sans-serif;
         }
-        
+
         .standby-screen-container {
             width: 100%;
             display: flex;
@@ -23,7 +26,7 @@
             align-items: center;
             flex-direction: column;
         }
-        
+
         .standby-screen-standby-screen {
             width: 100%;
             height: auto;
@@ -35,7 +38,7 @@
             background-color: rgba(248, 249, 250, 1);
             min-height: 100vh;
         }
-        
+
         .standby-screen-main-content {
             gap: 48px;
             width: 600px;
@@ -46,7 +49,7 @@
             flex-shrink: 0;
             margin: 0 auto;
         }
-        
+
         .standby-screen-logo-section {
             gap: 32px;
             top: 0px;
@@ -58,7 +61,7 @@
             align-items: center;
             flex-shrink: 0;
         }
-        
+
         .standby-screen-logo-circle {
             top: 0px;
             left: 19px;
@@ -73,12 +76,12 @@
             justify-content: center;
             background-color: rgba(184, 28, 34, 1);
         }
-        
+
         .standby-screen-umbrella {
             width: 64px;
             height: 64px;
         }
-        
+
         .standby-screen-text1 {
             top: 180px;
             left: 147px;
@@ -92,7 +95,7 @@
             line-height: 48px;
             text-decoration: none;
         }
-        
+
         .standby-screen-card-container {
             top: 253px;
             left: 30px;
@@ -108,7 +111,7 @@
             justify-content: center;
             background-color: rgba(255, 255, 255, 1);
         }
-        
+
         .standby-screen-card-content {
             gap: 32px;
             top: 27.5px;
@@ -120,7 +123,7 @@
             align-items: center;
             flex-shrink: 0;
         }
-        
+
         .standby-screen-student-card-icon {
             top: 0px;
             left: 146px;
@@ -135,12 +138,12 @@
             justify-content: center;
             background-color: rgba(230, 0, 32, 1);
         }
-        
+
         .standby-screen-credit-card {
             width: 40px;
             height: 40px;
         }
-        
+
         .standby-screen-text2 {
             top: 112px;
             left: 40px;
@@ -156,7 +159,7 @@
             width: 280px;
             white-space: nowrap;
         }
-        
+
         .standby-screen-touch-hint {
             gap: 8px;
             top: 152.5px;
@@ -168,7 +171,7 @@
             align-items: center;
             flex-shrink: 0;
         }
-        
+
         .standby-screen-text3 {
             top: 30px;
             left: 17px;
@@ -184,28 +187,22 @@
         }
     </style>
 </head>
+
 <body>
     <div class="standby-screen-container">
         <div class="standby-screen-standby-screen">
             <div class="standby-screen-main-content">
                 <div class="standby-screen-logo-section">
                     <div class="standby-screen-logo-circle">
-                        <img
-                            src="{% static 'images/umbrella.svg' %}"
-                            alt="Umbrella"
-                            class="standby-screen-umbrella"
-                        />
+                        <img src="{% static 'images/umbrella.svg' %}" alt="Umbrella" class="standby-screen-umbrella" />
                     </div>
                 </div>
                 <span class="standby-screen-text1">Parashare</span>
                 <div class="standby-screen-card-container">
                     <div class="standby-screen-card-content">
                         <div class="standby-screen-student-card-icon">
-                            <img
-                                src="{% static 'images/credit-card.svg' %}"
-                                alt="Credit Card"
-                                class="standby-screen-credit-card"
-                            />
+                            <img src="{% static 'images/credit-card.svg' %}" alt="Credit Card"
+                                class="standby-screen-credit-card" />
                         </div>
                         <span class="standby-screen-text2">
                             学生証をタップしてください
@@ -221,55 +218,115 @@
 
     <script>
         let isReading = false;
-        
-        function startNFCReading() {
+
+        async function startNFCReading() {
             if (isReading) return;
             
             isReading = true;
             console.log('NFC読み取りを開始します...');
             
-            // APIでNFC読み取りを開始
-            fetch('/api/nfc-read/', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({})
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success && data.student_id) {
-                    console.log('学生証認証成功:', data.student_id);
-                    window.location.href = `/2/?studentID=${data.student_id}`;
+            try {
+                // NFC読み取りAPI呼び出し（読み取り完了まで待機）
+                console.log('NFC読み取り待機中...');
+                
+                const nfcResponse = await fetch('/api/nfc-read/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({})
+                    // タイムアウトなし - NFC読み取り完了まで待機
+                });
+                
+                // HTTPステータスエラーをチェック
+                if (!nfcResponse.ok) {
+                    throw new Error(`HTTP Error: ${nfcResponse.status}`);
+                }
+                
+                const nfcData = await nfcResponse.json();
+                
+                if (nfcData.success && nfcData.student_id) {
+                    console.log('学生証認証成功:', nfcData.student_id);
+                    
+                    try {
+                        // 読み取り完了通知を送信（必ず完了を待つ）
+                        
+                       // await sendCompletionNotification(nfcData.student_id);
+                        console.log('通知送信完了 - ページ遷移を開始');
+                    } catch (notificationError) {
+                        console.error('通知送信失敗:', notificationError);
+                        // 通知失敗でも続行（ただし短い待機時間を追加）
+                        await new Promise(resolve => setTimeout(resolve, 500));
+                    }
+                    
+                    // 通知処理完了後にページ遷移
+                    window.location.href = `/2/?studentID=${nfcData.student_id}`;
                 } else {
-                    console.error('NFC読み取りエラー:', data.error);
-                    // エラー時は3秒後にデモ用IDで遷移
+                    console.error('NFC読み取りエラー:', nfcData.error);
+                    // エラー時は1秒後にデモ用IDで遷移
                     setTimeout(() => {
                         window.location.href = `/8/`;
                     }, 1000);
                 }
-            })
-            .catch(error => {
-                console.error('API呼び出しエラー:', error);
-                // エラー時は3秒後にデモ用IDで遷移
+            } catch (error) {
+                console.error('NFC読み取りエラー:', error);
+                // エラー時は1秒後にエラーページへ遷移
                 setTimeout(() => {
-                    const studentID = ''; // デモ用の学生ID
                     window.location.href = `/8/`;
                 }, 1000);
-            })
-            .finally(() => {
+            } finally {
                 isReading = false;
-            });
+            }
         }
-        
+        /*
+        // 読み取り完了通知を送信する関数
+        async function sendCompletionNotification(studentId) {
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 5000); // 5秒でタイムアウト
+            
+            try {
+                const response = await fetch('/api/nfc-request/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        student_id: studentId,
+                    }),
+                    signal: controller.signal
+                });
+                
+                clearTimeout(timeoutId);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP Error: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                console.log('読み取り完了通知:', data);
+                return data;
+            } catch (error) {
+                clearTimeout(timeoutId);
+                if (error.name === 'AbortError') {
+                    console.error('通知送信タイムアウト');
+                } else {
+                    console.error('読み取り完了通知エラー:', error);
+                }
+                throw error; // エラーを再スローして呼び出し元で処理
+            }
+
+        }
+        */
+
         // ページ読み込み後にNFC読み取りを開始
         window.addEventListener('load', () => {
             setTimeout(startNFCReading, 1000); // 1秒後に開始
         });
-        
+
         // タッチ/クリックでも読み取り開始
         document.addEventListener('click', startNFCReading);
         document.addEventListener('touchstart', startNFCReading);
     </script>
 </body>
+
 </html>
