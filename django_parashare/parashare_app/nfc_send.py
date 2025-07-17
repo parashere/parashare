@@ -23,7 +23,7 @@ def send_server_nfc(request):
             }, status=400)
         
         # ======== 外部サーバーへのリクエスト設定 ========
-        BASE_URL = "http://localhost:8000"  # 本番では実際のAPIサーバーURLに変更
+        BASE_URL = "http://chukyo-parashare.com:8000"  # 本番では実際のAPIサーバーURLに変更
         endpoint = f"{BASE_URL}/students/{student_id}/auth"
 
         # ヘッダー
