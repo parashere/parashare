@@ -16,5 +16,5 @@ urlpatterns = [
     path('8/', views.page8, name='page8'),
     path('9/', views.page9, name='page9'),
     path('api/nfc-read/', read_nfc_tag, name='nfc_read'),  # NFC読み取りAPI
-    path('api/nfc-request/', send_server_nfc, name='nfc_read'),  # NFC読み取りAPI
+    path('api/nfc-request/', send_server_nfc, name='nfc_request'),  # NFCリクエストAPI
 ]
