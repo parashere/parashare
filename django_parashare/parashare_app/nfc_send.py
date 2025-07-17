@@ -44,7 +44,9 @@ def send_server_nfc(request):
 
         # ======== 外部サーバーへリクエスト送信 ========
         logger.info(f"NFCリクエスト送信: student_id={student_id}")
-        response = requests.post(endpoint, headers=headers, timeout=10)
+        # 空のJSONオブジェクトを送信
+        payload = {}
+        response = requests.post(endpoint, headers=headers, json=payload, timeout=10)
         response.raise_for_status()
 
         # 成功レスポンス
