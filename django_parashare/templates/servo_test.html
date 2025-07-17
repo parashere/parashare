@@ -91,6 +91,14 @@
             <button class="button status-btn" onclick="testServo()">サーボテスト</button>
         </div>
         
+        <div style="margin-top: 20px;">
+            <h3>手動位置設定</h3>
+            <input type="range" id="positionSlider" min="-1" max="1" step="0.1" value="0" 
+                   style="width: 300px;" oninput="updateSliderValue()">
+            <span id="sliderValue">0.0</span>
+            <button class="button status-btn" onclick="setManualPosition()">位置設定</button>
+        </div>
+        
         <div id="result" class="result">
             結果がここに表示されます...
         </div>
@@ -115,8 +123,39 @@
         
         function showResult(message, isSuccess = true) {
             const resultDiv = document.getElementById('result');
-            resultDiv.textContent = message;
+            resultDiv.innerHTML = message.replace(/\n/g, '<br>'); // 改行を<br>に変換
             resultDiv.className = `result ${isSuccess ? 'success' : 'error'}`;
+        }
+        
+        function updateSliderValue() {
+            const slider = document.getElementById('positionSlider');
+            const display = document.getElementById('sliderValue');
+            display.textContent = parseFloat(slider.value).toFixed(1);
+        }
+        
+        async function setManualPosition() {
+            const slider = document.getElementById('positionSlider');
+            const value = parseFloat(slider.value);
+            
+            try {
+                showResult(`位置 ${value} に設定中...`, true);
+                const response = await fetch('/api/servo/position/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({position: value})
+                });
+                
+                const data = await response.json();
+                if (data.success) {
+                    showResult(`位置設定成功: ${data.message}`, true);
+                } else {
+                    showResult(`位置設定失敗: ${data.message}`, false);
+                }
+            } catch (error) {
+                showResult(`エラー: ${error.message}`, false);
+            }
         }
         
         async function openGate() {
