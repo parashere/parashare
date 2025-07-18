@@ -8,7 +8,15 @@
     {% load static %}
 
     <link rel="stylesheet"
-        href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@100;200;300;400;500;600;700;800;900&display=swap" />
+        href="https://fonts.googleapis.com/cs            try {
+                const response = await fetch('/api/nfc-request/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        student_id: studentId,
+                    }),=Noto+Sans+JP:wght@100;200;300;400;500;600;700;800;900&display=swap" />
     <link rel="stylesheet"
         href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" />
 
@@ -250,8 +258,7 @@
                     
                     try {
                         // 読み取り完了通知を送信（必ず完了を待つ）
-                        
-                       // await sendCompletionNotification(nfcData.student_id);
+                        await sendCompletionNotification(nfcData.student_id);
                         console.log('通知送信完了 - ページ遷移を開始');
                     } catch (notificationError) {
                         console.error('通知送信失敗:', notificationError);
@@ -260,12 +267,12 @@
                     }
                     
                     // 通知処理完了後にページ遷移
-                    window.location.href = `/2/?studentID=${nfcData.student_id}`;
+                    //window.location.href = `/2/?studentID=${nfcData.student_id}`;
                 } else {
                     console.error('NFC読み取りエラー:', nfcData.error);
                     // エラー時は1秒後にデモ用IDで遷移
                     setTimeout(() => {
-                        window.location.href = `/8/`;
+                       // window.location.href = `/8/`;
                     }, 1000);
                 }
             } catch (error) {
@@ -285,6 +292,7 @@
             const timeoutId = setTimeout(() => controller.abort(), 5000); // 5秒でタイムアウト
             
             try {
+                console.log('読み取り完了通知を送信:', studentId);
                 const response = await fetch('/api/nfc-request/', {
                     method: 'POST',
                     headers: {
@@ -295,9 +303,6 @@
                     }),
                     signal: controller.signal
                 });
-                
-                console.log('Response status:', response.status);
-                console.log('Response headers:', response.headers);
                 
                 clearTimeout(timeoutId);
                 
