@@ -98,11 +98,55 @@
     </div>
 
     <script>
-        // 10秒後に1ページに遷移
-        setTimeout(() => {
-            console.log('待機時間終了。1ページに遷移します...');
-            window.location.href = '/5/';
-        }, 10000);
+        let gateOpened = false;
+        
+        // シンプルなゲート開放関数
+        async function openGate() {
+            try {
+                console.log('ゲート開放を試行中...');
+                
+                // シンプルなfetch呼び出し
+                const response = await fetch('/api/servo/open/', {
+                    method: 'POST'
+                });
+                
+                console.log('Response status:', response.status);
+                console.log('Response OK:', response.ok);
+                
+                if (response.ok) {
+                    try {
+                        const data = await response.json();
+                        console.log('Response data:', data);
+                        
+                        if (data.success) {
+                            console.log('✓ ゲートを開きました:', data.message);
+                            gateOpened = true;
+                        } else {
+                            console.log('⚠ ゲートの開放に失敗:', data.message);
+                        }
+                    } catch (jsonError) {
+                        console.log('JSON parse error, trying as text...');
+                        const text = await response.text();
+                        console.log('Response as text:', text.substring(0, 100));
+                    }
+                } else {
+                    console.error('❌ HTTP Error:', response.status);
+                    const text = await response.text();
+                    console.error('Error response:', text.substring(0, 200));
+                }
+            } catch (error) {
+                console.error('❌ Network/Fetch error:', error);
+                console.log('処理を続行します...');
+            }
+        }
+
+        
+        // 9秒後にゲートを開放してから5ページに遷移
+        setTimeout(async () => {
+            await openGate();
+            console.log('処理完了。5ページに遷移します...');
+            //window.location.href = '/5/';
+        }, 3000);
     </script>
 </body>
 </html>

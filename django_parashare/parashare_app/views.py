@@ -61,3 +61,7 @@ def page8(request):
 def page9(request):
     """ページ9"""
     return render(request, '9.html')
+
+def servo_test(request):
+    """サーボテストページ"""
+    return render(request, 'servo_test.html')
