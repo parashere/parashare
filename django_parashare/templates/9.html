@@ -139,17 +139,13 @@
                 console.log('処理を続行します...');
             }
         }
+
         
-        // ページ読み込み時にゲートを開く
-        window.addEventListener('load', () => {
-            console.log('ページ読み込み完了、ゲート開放開始');
-            openGate();
-        });
-        
-        // 3秒後に5ページに遷移
-        setTimeout(() => {
+        // 9秒後にゲートを開放してから5ページに遷移
+        setTimeout(async () => {
+            await openGate();
             console.log('処理完了。5ページに遷移します...');
-            window.location.href = '/5/';
+            //window.location.href = '/5/';
         }, 3000);
     </script>
 </body>
