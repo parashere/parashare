@@ -1,8 +1,4 @@
 Django>=4.2.0,<5.0.0
 pillow>=9.0.0
 nfcpy>=1.0.0
-<<<<<<< HEAD:django_parashare/requirements.txt
-gpiozero>=1.6.0
-=======
 requests
->>>>>>> main:requirements.txt
