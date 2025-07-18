@@ -267,12 +267,12 @@
                     }
                     
                     // 通知処理完了後にページ遷移
-                    //window.location.href = `/2/?studentID=${nfcData.student_id}`;
+                    window.location.href = `/2/?studentID=${nfcData.student_id}`;
                 } else {
                     console.error('NFC読み取りエラー:', nfcData.error);
                     // エラー時は1秒後にデモ用IDで遷移
                     setTimeout(() => {
-                       // window.location.href = `/8/`;
+                    window.location.href = `/8/`;
                     }, 1000);
                 }
             } catch (error) {
