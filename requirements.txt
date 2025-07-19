@@ -3,4 +3,4 @@ pillow>=9.0.0
 nfcpy>=1.0.0
 gpiozero>=1.6.0
 requests
-pigpiod
+pigpio>=1.79.0
