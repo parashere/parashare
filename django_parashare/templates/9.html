@@ -191,11 +191,11 @@
             // RFID読み取り後、少し待ってからゲートを開放
             setTimeout(async () => {
                 document.getElementById('status-text').textContent = 'ゲート開放中...';
-                await openGate();
-                console.log('処理完了。5ページに遷移します...');
                 
                 // RFIDが検出された場合は、tag_idをパラメータとして渡す
                 if (rfidDetected && detectedTagId) {
+                await openGate();
+                console.log('処理完了。5ページに遷移します...');
                     window.location.href = `/5/?tag_id=${detectedTagId}`;
                 } else {
                     window.location.href = '/8/';
