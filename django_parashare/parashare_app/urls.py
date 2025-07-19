@@ -2,7 +2,7 @@ from django.urls import path
 from . import views
 from .nfc_reader import read_nfc_tag
 from .sendserver import send_server_nfc
-from .servo_controller_simple import open_gate_api, close_gate_api, gate_status_api
+from .servo_controller_simple import open_gate_api, close_gate_api, gate_status_api, set_servo_angle_api
 from .rfid_reader import read_rfid_api, rfid_status_api
 urlpatterns = [
     path('', views.page0, name='home'),  # ルートURLでページ0を表示

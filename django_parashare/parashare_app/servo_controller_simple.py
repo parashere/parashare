@@ -46,7 +46,7 @@ class ServoController:
         """ゲートを開く"""
         try:
             if self.servo:
-                self.servo.value = 1.0  # 最大位置
+                self.servo.value = 0.0  # 最大位置
                 sleep(2)
             else:
                 sleep(1)  # シミュレーション
@@ -66,7 +66,7 @@ class ServoController:
         """ゲートを閉じる"""
         try:
             if self.servo:
-                self.servo.value = 0.0  # 最小位置
+                self.servo.value = 1.0  # 最小位置
                 sleep(2)
             else:
                 sleep(1)  # シミュレーション
