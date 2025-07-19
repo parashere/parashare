@@ -74,19 +74,29 @@ class ServoController:
             'pin': self.pin
         }
 
-# グローバルなサーボコントローラーインスタンス
-servo_controller = ServoController()
+# グローバルなサーボコントローラーインスタンス（遅延初期化）
+servo_controller = None
+
+def get_servo_controller():
+    """サーボコントローラーのシングルトンインスタンスを取得"""
+    global servo_controller
+    if servo_controller is None:
+        print("📡 サーボコントローラーを初期化中...")
+        servo_controller = ServoController()
+        print("✅ サーボコントローラー初期化完了")
+    return servo_controller
 
 @csrf_exempt
 @require_http_methods(["POST"])
 def open_gate_api(request):
     """ゲートを開くAPI"""
     try:
-        success = servo_controller.open_gate()
+        controller = get_servo_controller()
+        success = controller.open_gate()
         return JsonResponse({
             'success': success,
             'message': 'ゲートを開きました' if success else 'ゲートの開放に失敗しました',
-            'status': servo_controller.get_status()
+            'status': controller.get_status()
         })
     except Exception as e:
         return JsonResponse({
@@ -99,11 +109,12 @@ def open_gate_api(request):
 def close_gate_api(request):
     """ゲートを閉じるAPI"""
     try:
-        success = servo_controller.close_gate()
+        controller = get_servo_controller()
+        success = controller.close_gate()
         return JsonResponse({
             'success': success,
             'message': 'ゲートを閉じました' if success else 'ゲートの閉鎖に失敗しました',
-            'status': servo_controller.get_status()
+            'status': controller.get_status()
         })
     except Exception as e:
         return JsonResponse({
@@ -114,7 +125,8 @@ def close_gate_api(request):
 @require_http_methods(["GET"])
 def gate_status_api(request):
     """ゲートの状態を取得するAPI"""
+    controller = get_servo_controller()
     return JsonResponse({
         'success': True,
-        'status': servo_controller.get_status()
+        'status': controller.get_status()
     })
