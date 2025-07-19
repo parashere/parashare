@@ -3,13 +3,13 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
 import json
 import logging
+from time import sleep
 
 logger = logging.getLogger(__name__)
 
 # Raspberry Pi環境でのみgpiozeroを使用
 try:
     from gpiozero import Servo
-    from time import sleep
     SERVO_AVAILABLE = True
 except ImportError:
     SERVO_AVAILABLE = False
