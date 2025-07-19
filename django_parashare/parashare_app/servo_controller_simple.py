@@ -27,7 +27,7 @@ class ServoController:
             try:
                 factory = PiGPIOFactory()
                 self.servo = Servo(pin=self.pin, pin_factory=factory)
-                self.servo.value = 0.0  # 初期位置（中央）
+                #self.servo.value = 0.0  # 初期位置（中央）
                 sleep(1)
                 log_msg = f"Servo initialized on pin {self.pin} with PiGPIOFactory"
                 logger.info(log_msg)
