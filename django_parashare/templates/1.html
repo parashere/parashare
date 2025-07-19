@@ -292,7 +292,7 @@
             const timeoutId = setTimeout(() => controller.abort(), 5000); // 5秒でタイムアウト
             
             try {
-                console.log('読み取り完了通知を送信:', studentId);
+                
                 const response = await fetch('/api/nfc-request/', {
                     method: 'POST',
                     headers: {
@@ -301,7 +301,7 @@
                     body: JSON.stringify({
                         student_id: studentId,
                     }),
-                    signal: controller.signal
+o                    signal: controller.signal
                 });
                 
                 clearTimeout(timeoutId);
