@@ -79,7 +79,7 @@ class RFIDReader:
             return None
         return None
 
-    def read_multiple_tags(self, count=2):
+    def read_multiple_tags(self, count=3):
         """複数回タグを読み取り、最も多く検出されたIDを返す"""
         if not self.connect():
             return None, []
@@ -140,9 +140,9 @@ def get_rfid_reader():
 def read_rfid_api(request):
     """RFID読み取りAPI"""
     try:
-        # リクエストから読み取り回数を取得（デフォルト10回）
+        # リクエストから読み取り回数を取得（デフォルト3回）
         data = json.loads(request.body) if request.body else {}
-        read_count = data.get('count',2)
+        read_count = data.get('count', 3)
         
         reader = get_rfid_reader()
         most_common_tag, read_attempts = reader.read_multiple_tags(read_count)
