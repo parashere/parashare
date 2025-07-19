@@ -151,8 +151,17 @@ def close_gate_api(request):
 @require_http_methods(["GET"])
 def gate_status_api(request):
     """ゲートの状態を取得するAPI"""
-    controller = get_servo_controller()
-    return JsonResponse({
-        'success': True,
-        'status': controller.get_status()
-    })
+    try:
+        controller = get_servo_controller()
+        return JsonResponse({
+            'success': True,
+            'status': controller.get_status(),
+            'logs': controller.logs[-10:]  # 最新の10件のログ
+        })
+    except Exception as e:
+        error_msg = f'エラーが発生しました: {str(e)}'
+        return JsonResponse({
+            'success': False,
+            'message': error_msg,
+            'logs': [error_msg]
+        }, status=500)
