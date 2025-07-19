@@ -2,21 +2,6 @@ from django.shortcuts import render
 from django.http import HttpResponse
 from .nfc_reader import read_nfc_tag
 
-def startup(request):
-    """立ち上げ中画面を表示"""
-    return render(request, 'startup.html')
-
-def standby(request):
-    """スタンバイ画面を表示"""
-    return render(request, 'standby.html')
-
-def login_success(request):
-    """ログイン成功画面を表示"""
-    student_id = request.GET.get('studentID', 't323')
-    context = {
-        'student_id': student_id
-    }
-    return render(request, 'login_success.html', context)
 
 def page0(request):
     """ページ0 - 立ち上げ中画面"""
