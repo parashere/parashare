@@ -17,7 +17,7 @@ except ImportError:
     logger.warning("pyserial not available. RFID reading will be simulated.")
 
 class RFIDReader:
-    def __init__(self, port='/dev/ttyAMA0', baud_rate=115200):
+    def __init__(self, port='/dev/ttyACM0', baud_rate=115200):
         self.port = port
         self.baud_rate = baud_rate
         self.ser = None

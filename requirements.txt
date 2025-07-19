@@ -4,4 +4,4 @@ nfcpy>=1.0.0
 gpiozero>=1.6.0
 pigpio
 requests
-serial
+pyserial

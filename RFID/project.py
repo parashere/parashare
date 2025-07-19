@@ -24,7 +24,7 @@ def read_single_tag(ser):
     return None
 
 def main():
-    SERIAL_PORT = 'COM5'
+    SERIAL_PORT = '/dev/ttyACM0'  # Raspberry Pi用のシリアルポート
     BAUD_RATE = 115200
     
     ser = None
