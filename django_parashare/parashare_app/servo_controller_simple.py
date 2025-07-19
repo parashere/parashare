@@ -26,10 +26,16 @@ class ServoController:
         if SERVO_AVAILABLE:
             try:
                 factory = PiGPIOFactory()
-                self.servo = Servo(pin=self.pin, pin_factory=factory)
+                # サーボの制御範囲を拡張（0.5ms～2.5msのパルス幅）
+                self.servo = Servo(
+                    pin=self.pin, 
+                    pin_factory=factory,
+                    min_pulse_width=0.5/1000,  # 0.5ms
+                    max_pulse_width=2.5/1000   # 2.5ms
+                )
                 #self.servo.value = 0.0  # 初期位置（中央）
                 sleep(1)
-                log_msg = f"Servo initialized on pin {self.pin} with PiGPIOFactory"
+                log_msg = f"Servo initialized on pin {self.pin} with PiGPIOFactory (extended range)"
                 logger.info(log_msg)
                 self.logs.append(log_msg)
             except Exception as e:
@@ -52,7 +58,7 @@ class ServoController:
                 sleep(1)  # シミュレーション
             
             self.is_open = True
-            log_msg = "Gate opened"
+            log_msg = "Gate opened (1.0)"
             logger.info(log_msg)
             self.logs.append(log_msg)
             return True
@@ -66,13 +72,13 @@ class ServoController:
         """ゲートを閉じる"""
         try:
             if self.servo:
-                self.servo.value =-0.5  # 最小位置
+                self.servo.value = -1.0  # 最小位置
                 sleep(2)
             else:
                 sleep(1)  # シミュレーション
             
             self.is_open = False
-            log_msg = "Gate closed"
+            log_msg = "Gate closed (-1.0)"
             logger.info(log_msg)
             self.logs.append(log_msg)
             return True
