@@ -3,13 +3,14 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
 import json
 import logging
+from time import sleep
 
 logger = logging.getLogger(__name__)
 
 # Raspberry Pi環境でのみgpiozeroを使用
 try:
     from gpiozero import Servo
-    from time import sleep
+    from gpiozero.pins.pigpio import PiGPIOFactory
     SERVO_AVAILABLE = True
 except ImportError:
     SERVO_AVAILABLE = False
@@ -20,18 +21,26 @@ class ServoController:
         self.pin = pin
         self.servo = None
         self.is_open = False
+        self.logs = []  # ログメッセージを保存するリスト
         
         if SERVO_AVAILABLE:
             try:
-                self.servo = Servo(pin=self.pin)
-                self.servo.value = 0.0  # 初期位置（中央）
+                factory = PiGPIOFactory()
+                self.servo = Servo(pin=self.pin, pin_factory=factory)
+                #self.servo.value = 0.0  # 初期位置（中央）
                 sleep(1)
-                logger.info(f"Servo initialized on pin {self.pin}")
+                log_msg = f"Servo initialized on pin {self.pin} with PiGPIOFactory"
+                logger.info(log_msg)
+                self.logs.append(log_msg)
             except Exception as e:
-                logger.error(f"Failed to initialize servo: {e}")
+                log_msg = f"Failed to initialize servo: {e}"
+                logger.error(log_msg)
+                self.logs.append(log_msg)
                 self.servo = None
         else:
-            logger.info("Servo controller in simulation mode")
+            log_msg = "Servo controller in simulation mode"
+            logger.info(log_msg)
+            self.logs.append(log_msg)
     
     def open_gate(self):
         """ゲートを開く"""
@@ -43,10 +52,14 @@ class ServoController:
                 sleep(1)  # シミュレーション
             
             self.is_open = True
-            logger.info("Gate opened")
+            log_msg = "Gate opened"
+            logger.info(log_msg)
+            self.logs.append(log_msg)
             return True
         except Exception as e:
-            logger.error(f"Failed to open gate: {e}")
+            log_msg = f"Failed to open gate: {e}"
+            logger.error(log_msg)
+            self.logs.append(log_msg)
             return False
     
     def close_gate(self):
@@ -59,10 +72,14 @@ class ServoController:
                 sleep(1)  # シミュレーション
             
             self.is_open = False
-            logger.info("Gate closed")
+            log_msg = "Gate closed"
+            logger.info(log_msg)
+            self.logs.append(log_msg)
             return True
         except Exception as e:
-            logger.error(f"Failed to close gate: {e}")
+            log_msg = f"Failed to close gate: {e}"
+            logger.error(log_msg)
+            self.logs.append(log_msg)
             return False
     
     def get_status(self):
@@ -71,27 +88,45 @@ class ServoController:
             'is_open': self.is_open,
             'servo_available': SERVO_AVAILABLE,
             'servo_initialized': self.servo is not None,
-            'pin': self.pin
+            'pin': self.pin,
+            'logs': self.logs[-10:]  # 最新の10件のログを返す
         }
 
-# グローバルなサーボコントローラーインスタンス
-servo_controller = ServoController()
+# グローバルなサーボコントローラーインスタンス（遅延初期化）
+servo_controller = None
+
+def get_servo_controller():
+    """サーボコントローラーのシングルトンインスタンスを取得"""
+    global servo_controller
+    if servo_controller is None:
+        init_msg = "📡 サーボコントローラーを初期化中..."
+        print(init_msg)
+        servo_controller = ServoController()
+        complete_msg = "✅ サーボコントローラー初期化完了"
+        print(complete_msg)
+        servo_controller.logs.append(init_msg)
+        servo_controller.logs.append(complete_msg)
+    return servo_controller
 
 @csrf_exempt
 @require_http_methods(["POST"])
 def open_gate_api(request):
     """ゲートを開くAPI"""
     try:
-        success = servo_controller.open_gate()
+        controller = get_servo_controller()
+        success = controller.open_gate()
         return JsonResponse({
             'success': success,
             'message': 'ゲートを開きました' if success else 'ゲートの開放に失敗しました',
-            'status': servo_controller.get_status()
+            'status': controller.get_status(),
+            'logs': controller.logs[-5:]  # 最新の5件のログ
         })
     except Exception as e:
+        error_msg = f'エラーが発生しました: {str(e)}'
         return JsonResponse({
             'success': False,
-            'message': f'エラーが発生しました: {str(e)}'
+            'message': error_msg,
+            'logs': [error_msg]
         }, status=500)
 
 @csrf_exempt
@@ -99,22 +134,36 @@ def open_gate_api(request):
 def close_gate_api(request):
     """ゲートを閉じるAPI"""
     try:
-        success = servo_controller.close_gate()
+        controller = get_servo_controller()
+        success = controller.close_gate()
         return JsonResponse({
             'success': success,
             'message': 'ゲートを閉じました' if success else 'ゲートの閉鎖に失敗しました',
-            'status': servo_controller.get_status()
+            'status': controller.get_status(),
+            'logs': controller.logs[-5:]  # 最新の5件のログ
         })
     except Exception as e:
+        error_msg = f'エラーが発生しました: {str(e)}'
         return JsonResponse({
             'success': False,
-            'message': f'エラーが発生しました: {str(e)}'
+            'message': error_msg,
+            'logs': [error_msg]
         }, status=500)
 
 @require_http_methods(["GET"])
 def gate_status_api(request):
     """ゲートの状態を取得するAPI"""
-    return JsonResponse({
-        'success': True,
-        'status': servo_controller.get_status()
-    })
+    try:
+        controller = get_servo_controller()
+        return JsonResponse({
+            'success': True,
+            'status': controller.get_status(),
+            'logs': controller.logs[-10:]  # 最新の10件のログ
+        })
+    except Exception as e:
+        error_msg = f'エラーが発生しました: {str(e)}'
+        return JsonResponse({
+            'success': False,
+            'message': error_msg,
+            'logs': [error_msg]
+        }, status=500)
