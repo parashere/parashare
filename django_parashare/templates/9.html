@@ -86,7 +86,8 @@
             <div class="waitscreen-completion-card">
                 <span class="waitscreen-text1">
                     貸出システム処理中です<br>
-                    10秒程度お待ちください<br>
+                    RFID読み取り中...<br>
+                    <span id="status-text">10秒程度お待ちください</span>
                 </span>
                 <img
                     src="{% static 'images/loader-circle.svg' %}"
@@ -99,6 +100,50 @@
 
     <script>
         let gateOpened = false;
+        let rfidDetected = false;
+        let detectedTagId = null;
+        
+        // RFID読み取り関数
+        async function readRFID() {
+            try {
+                console.log('RFID読み取りを開始...');
+                document.getElementById('status-text').textContent = 'RFID読み取り中...';
+                
+                const response = await fetch('/api/rfid/read/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ count: 3 })
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    console.log('RFID Response data:', data);
+                    
+                    if (data.success && data.tag_id) {
+                        rfidDetected = true;
+                        detectedTagId = data.tag_id;
+                        console.log('✓ RFID検出成功:', data.tag_id);
+                        document.getElementById('status-text').textContent = `RFID検出: ${data.tag_id}`;
+                        
+                        // ログ出力
+                        if (data.read_attempts) {
+                            console.log('Read attempts:', data.read_attempts);
+                        }
+                    } else {
+                        console.log('⚠ RFID検出失敗:', data.message);
+                        document.getElementById('status-text').textContent = 'RFID検出できませんでした';
+                    }
+                } else {
+                    console.error('❌ RFID API Error:', response.status);
+                    document.getElementById('status-text').textContent = 'RFID読み取りエラー';
+                }
+            } catch (error) {
+                console.error('❌ RFID Network error:', error);
+                document.getElementById('status-text').textContent = 'RFID通信エラー';
+            }
+        }
         
         // シンプルなゲート開放関数
         async function openGate() {
@@ -138,13 +183,25 @@
             }
         }
 
-        
-        // 9秒後にゲートを開放してから5ページに遷移
-        setTimeout(async () => {
-            await openGate();
-            console.log('処理完了。5ページに遷移します...');
-            window.location.href = '/5/';
-        }, 10000);
+        // ページ読み込み時にRFID読み取りを開始
+        document.addEventListener('DOMContentLoaded', async function() {
+            console.log('ページ読み込み完了。RFID読み取りを開始します...');
+            await readRFID();
+            
+            // RFID読み取り後、少し待ってからゲートを開放
+            setTimeout(async () => {
+                document.getElementById('status-text').textContent = 'ゲート開放中...';
+                
+                // RFIDが検出された場合は、tag_idをパラメータとして渡す
+                if (rfidDetected && detectedTagId) {
+                await openGate();
+                console.log('処理完了。5ページに遷移します...');
+                    window.location.href = `/5/?tag_id=${detectedTagId}`;
+                } else {
+                    window.location.href = '/8/';
+                }
+            }, 2000);
+        });
     </script>
 </body>
 </html>
