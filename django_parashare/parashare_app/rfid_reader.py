@@ -7,7 +7,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
 
 logger = logging.getLogger(__name__)
-
+read_count=2
 # RFID環境の可用性チェック
 try:
     import serial
@@ -79,7 +79,7 @@ class RFIDReader:
             return None
         return None
 
-    def read_multiple_tags(self, count=7):
+    def read_multiple_tags(self, count=read_count):
         """複数回タグを読み取り、最も多く検出されたIDを返す"""
         if not self.connect():
             return None, []
@@ -142,7 +142,7 @@ def read_rfid_api(request):
     try:
         # リクエストから読み取り回数を取得（デフォルト10回）
         data = json.loads(request.body) if request.body else {}
-        read_count = data.get('count', 10)
+        read_count = data.get('count', read_count)
         
         reader = get_rfid_reader()
         most_common_tag, read_attempts = reader.read_multiple_tags(read_count)
