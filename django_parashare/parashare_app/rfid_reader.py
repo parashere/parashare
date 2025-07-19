@@ -1,16 +1,23 @@
-import serial
 import time
-from django.http import JsonResponse
-from django.views.decorators.csrf import csrf_exempt
-from django.views.decorators.http import require_http_methods
 import json
 import logging
 from collections import Counter
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_http_methods
 
 logger = logging.getLogger(__name__)
 
+# RFID環境の可用性チェック
+try:
+    import serial
+    RFID_AVAILABLE = True
+except ImportError:
+    RFID_AVAILABLE = False
+    logger.warning("pyserial not available. RFID reading will be simulated.")
+
 class RFIDReader:
-    def __init__(self, port='COM5', baud_rate=115200):
+    def __init__(self, port='/dev/ttyAMA0', baud_rate=115200):
         self.port = port
         self.baud_rate = baud_rate
         self.ser = None
@@ -18,6 +25,12 @@ class RFIDReader:
 
     def connect(self):
         """シリアルポートに接続"""
+        if not RFID_AVAILABLE:
+            log_msg = "RFID reader in simulation mode (pyserial not available)"
+            logger.info(log_msg)
+            self.logs.append(log_msg)
+            return True  # シミュレーションモードでは成功として扱う
+            
         try:
             self.ser = serial.Serial(self.port, self.baud_rate, timeout=2)
             log_msg = f"RFID Reader connected to {self.port}"
