@@ -10,6 +10,7 @@ logger = logging.getLogger(__name__)
 # Raspberry Pi環境でのみgpiozeroを使用
 try:
     from gpiozero import Servo
+    from gpiozero.pins.pigpio import PiGPIOFactory
     SERVO_AVAILABLE = True
 except ImportError:
     SERVO_AVAILABLE = False
@@ -24,10 +25,11 @@ class ServoController:
         
         if SERVO_AVAILABLE:
             try:
-                self.servo = Servo(pin=self.pin)
+                factory = PiGPIOFactory()
+                self.servo = Servo(pin=self.pin, pin_factory=factory)
                 self.servo.value = 0.0  # 初期位置（中央）
                 sleep(1)
-                log_msg = f"Servo initialized on pin {self.pin}"
+                log_msg = f"Servo initialized on pin {self.pin} with PiGPIOFactory"
                 logger.info(log_msg)
                 self.logs.append(log_msg)
             except Exception as e:
