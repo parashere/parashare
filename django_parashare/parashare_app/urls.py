@@ -21,6 +21,6 @@ urlpatterns = [
     path('api/rfid/read/', read_rfid_api, name='rfid_read_api'),  # RFID読み取りAPI
     path('api/rfid/status/', rfid_status_api, name='rfid_status_api'),  # RFID状況取得API
     path('api/servo/open/', open_gate_api, name='open_gate_api'),  # ゲートを開くAPI
-    path('api/servo/close/', close_gate_api, name='close_gate_api'),  # ゲートを閉じるAPI    
+    path('api/servo/close/', , name='close_gate_api'),  # ゲートを閉じるAPI    
     path('api/servo/status/', gate_status_api, name='gate_status_api'),  # ゲートの状態を取得するAPI    
 ]
