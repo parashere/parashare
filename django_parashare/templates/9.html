@@ -194,7 +194,7 @@
                 
                 // RFIDが検出された場合は、tag_idをパラメータとして渡す
                 if (rfidDetected && detectedTagId) {
-                await openGate();
+                /-await openGate();
                 console.log('処理完了。5ページに遷移します...');
                     window.location.href = `/5/?tag_id=${detectedTagId}`;
                 } else {
