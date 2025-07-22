@@ -22,6 +22,12 @@ class StudentAuthRequest(BaseModel):
 class StudentAuthData(BaseModel):
     valid: bool
     student_id: str
+    
+# 学籍番号が現在レンタル可能かどうかを返す専用レスポンス
+class RentAvailabilityData(BaseModel):
+    student_id: str
+    can_rent: bool  # True → 貸出可 / False → 貸出不可
+
 # ポイント情報
 class PointData(BaseModel):
     points: int = Field(..., example=350)

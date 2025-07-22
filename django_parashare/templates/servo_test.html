@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>サーボテスト</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 20px;
+            background-color: #f5f5f5;
+        }
+        
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .button {
+            padding: 15px 30px;
+            margin: 10px;
+            font-size: 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        .open-btn {
+            background-color: #28a745;
+            color: white;
+        }
+        
+        .open-btn:hover {
+            background-color: #218838;
+        }
+        
+        .close-btn {
+            background-color: #dc3545;
+            color: white;
+        }
+        
+        .close-btn:hover {
+            background-color: #c82333;
+        }
+        
+        .status-btn {
+            background-color: #007bff;
+            color: white;
+        }
+        
+        .status-btn:hover {
+            background-color: #0056b3;
+        }
+        
+        .result {
+            margin-top: 20px;
+            padding: 10px;
+            border-radius: 5px;
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            min-height: 50px;
+        }
+        
+        .success {
+            background-color: #d4edda;
+            border-color: #c3e6cb;
+            color: #155724;
+        }
+        
+        .error {
+            background-color: #f8d7da;
+            border-color: #f5c6cb;
+            color: #721c24;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>サーボモーター制御テスト</h1>
+        <p>このページでゲートの開け閉めをテストできます。</p>
+        
+        <div>
+            <button class="button open-btn" onclick="openGate()">ゲートを開く</button>
+            <button class="button close-btn" onclick="closeGate()">ゲートを閉じる</button>
+            <button class="button status-btn" onclick="getStatus()">状態確認</button>
+            <button class="button status-btn" onclick="testServo()">サーボテスト</button>
+        </div>
+        
+        <div style="margin-top: 20px;">
+            <h3>手動位置設定</h3>
+            <input type="range" id="positionSlider" min="-1" max="1" step="0.1" value="0" 
+                   style="width: 300px;" oninput="updateSliderValue()">
+            <span id="sliderValue">0.0</span>
+            <button class="button status-btn" onclick="setManualPosition()">位置設定</button>
+        </div>
+        
+        <div id="result" class="result">
+            結果がここに表示されます...
+        </div>
+    </div>
+
+    <script>
+        // CSRFトークンを取得する関数
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+        
+        function showResult(message, isSuccess = true) {
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = message.replace(/\n/g, '<br>'); // 改行を<br>に変換
+            resultDiv.className = `result ${isSuccess ? 'success' : 'error'}`;
+        }
+        
+        function updateSliderValue() {
+            const slider = document.getElementById('positionSlider');
+            const display = document.getElementById('sliderValue');
+            display.textContent = parseFloat(slider.value).toFixed(1);
+        }
+        
+        async function setManualPosition() {
+            const slider = document.getElementById('positionSlider');
+            const value = parseFloat(slider.value);
+            
+            try {
+                showResult(`位置 ${value} に設定中...`, true);
+                const response = await fetch('/api/servo/position/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({position: value})
+                });
+                
+                const data = await response.json();
+                if (data.success) {
+                    showResult(`位置設定成功: ${data.message}`, true);
+                } else {
+                    showResult(`位置設定失敗: ${data.message}`, false);
+                }
+            } catch (error) {
+                showResult(`エラー: ${error.message}`, false);
+            }
+        }
+        
+        async function openGate() {
+            try {
+                showResult('ゲートを開いています...', true);
+                const response = await fetch('/api/servo/open/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': getCookie('csrftoken')
+                    }
+                });
+                
+                const data = await response.json();
+                if (data.success) {
+                    showResult(`成功: ${data.message}`, true);
+                } else {
+                    showResult(`失敗: ${data.message}`, false);
+                }
+            } catch (error) {
+                showResult(`エラー: ${error.message}`, false);
+            }
+        }
+        
+        async function closeGate() {
+            try {
+                showResult('ゲートを閉じています...', true);
+                const response = await fetch('/api/servo/close/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': getCookie('csrftoken')
+                    }
+                });
+                
+                const data = await response.json();
+                if (data.success) {
+                    showResult(`成功: ${data.message}`, true);
+                } else {
+                    showResult(`失敗: ${data.message}`, false);
+                }
+            } catch (error) {
+                showResult(`エラー: ${error.message}`, false);
+            }
+        }
+        
+        async function getStatus() {
+            try {
+                showResult('状態を確認しています...', true);
+                const response = await fetch('/api/servo/status/', {
+                    method: 'GET'
+                });
+                
+                const data = await response.json();
+                if (data.success) {
+                    const status = data.status;
+                    const statusText = `
+                        ゲート状態: ${status.is_open ? '開' : '閉'}
+                        サーボ利用可能: ${status.servo_available ? 'はい' : 'いいえ'}
+                        サーボ初期化済み: ${status.servo_initialized ? 'はい' : 'いいえ'}
+                        ピン番号: ${status.pin}
+                        現在の値: ${status.current_value ?? 'N/A'}
+                    `;
+                    showResult(statusText, true);
+                } else {
+                    showResult('状態の取得に失敗しました', false);
+                }
+            } catch (error) {
+                showResult(`エラー: ${error.message}`, false);
+            }
+        }
+        
+        async function testServo() {
+            try {
+                showResult('サーボテストを実行しています...', true);
+                const response = await fetch('/api/servo/test/', {
+                    method: 'POST'
+                });
+                
+                const data = await response.json();
+                if (data.success) {
+                    showResult(`テスト成功: ${data.message}`, true);
+                } else {
+                    showResult(`テスト失敗: ${data.message}`, false);
+                }
+            } catch (error) {
+                showResult(`エラー: ${error.message}`, false);
+            }
+        }
+    </script>
+</body>
+</html>

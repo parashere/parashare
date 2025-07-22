@@ -40,7 +40,8 @@ CREATE TABLE "para_stand" (
 CREATE TABLE "rental_history" (
   "id" UUID DEFAULT gen_random_uuid() NOT NULL,
   "students_id" UUID NOT NULL,
-  "parasol_id" UUID NOT NULL,
+  "rent_parasol_id" UUID NOT NULL,
+  "return_parasol_id" UUID,
   "rent_stand_from" UUID NOT NULL,
   "return_stand_to" UUID,
   "rented_at" TIMESTAMPTZ NOT NULL,
