@@ -4,6 +4,23 @@
 
 postgresqlをインストール
 
+```
+brew install postgresql
+```
+
+```
+psql --version 
+```
+
+```
+sudo initdb /usr/local/var/postgres -E utf8
+```
+
+```
+psql -l
+```
+
+
 /sqlの中身がデータベースの中身
 
 ---
