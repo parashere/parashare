@@ -1,9 +1,9 @@
 from fastapi import APIRouter, Path, Depends,status,HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select, func, and_
+from sqlalchemy import select, func, and_, desc
 from app.db.database import get_async_session
 from app.db.db_models import Students,ParaStand, Parasol, RentalHistory, Parasol, RentalHistory, ParaStand, ParasolStatus
-from app.schemas.api_schemas import StudentAuthRequest, CommonResponse, StudentAuthData,RentRequest, ErrorResponse
+from app.schemas.api_schemas import StudentAuthRequest, CommonResponse, StudentAuthData,RentRequest, ErrorResponse, RentAvailabilityData
 from fastapi.responses import JSONResponse
 from uuid import UUID
 from datetime import datetime, timedelta
@@ -13,7 +13,7 @@ router = APIRouter()
 @router.post("/students/{student_id}/auth", response_model=CommonResponse)
 async def auth_or_register_student(
     student_id: str = Path(..., description="学籍番号"),
-    request: StudentAuthRequest = ...,
+    #request: StudentAuthRequest = ...,
     session: AsyncSession = Depends(get_async_session)
 ):
     # 学生情報を検索
@@ -42,6 +42,53 @@ async def auth_or_register_student(
         status=200,
         message="Authentication Successful",
         data=StudentAuthData(valid=True, student_id=student.student_id).dict()
+    )
+    
+@router.post("/students/{student_id}", response_model=CommonResponse)
+async def check_student_can_rent(
+    student_id: str = Path(..., description="学籍番号"),
+    session: AsyncSession = Depends(get_async_session),
+):
+    # 1) 学生情報を取得（student_id → UUID）
+    res_student = await session.execute(
+        select(Students).where(Students.student_id == student_id)
+    )
+    student = res_student.scalar_one_or_none()
+    if student is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Student not found"
+        )
+
+    # 2) 最新のレンタル履歴を 1 件だけ取得
+    res_history = await session.execute(
+        select(RentalHistory)
+        .where(RentalHistory.students_id == student.id)
+        .order_by(desc(RentalHistory.rented_at))
+        .limit(1)
+    )
+    latest = res_history.scalar_one_or_none()
+
+    
+    
+    # 3) 履歴が無い、または返却済みなら OK
+    if latest is None or latest.returned_at is not None:
+        
+        availability = RentAvailabilityData(student_id=student_id, can_rent=True)
+        
+        return CommonResponse(
+            status=200,
+            message="Can Rent",
+            data=availability.model_dump()
+        )
+
+    availability = RentAvailabilityData(student_id=student_id, can_rent=False)
+    # 4) 返却されていない ⇒ 現在レンタル中なので No
+    return CommonResponse(
+        
+        status=422,
+        message="Cannot Rent",
+        data=availability.model_dump()
     )
 
 @router.get("/stands/list")
