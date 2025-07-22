@@ -42,59 +42,6 @@ async def auth_or_register_student(
         message="Authentication Successful",
         data=StudentAuthData(valid=True, student_id=student.student_id).dict()
     )
-<<<<<<< Updated upstream
-
-=======
-    
-@router.post(
-    "/students/{student_id}",
-    response_model=CommonResponse,
-    responses={
-        422: {"model": CommonResponse, "description": "Cannot rent now"},
-        404: {"description": "Student not found"},
-    },
-)
-async def check_student_can_rent(
-    student_id: str = Path(..., description="学籍番号"),
-    session: AsyncSession = Depends(get_async_session),
-):
-    # 1) 学生を取得
-    student = (
-        await session.execute(
-            select(Students).where(Students.student_id == student_id)
-        )
-    ).scalar_one_or_none()
-
-    if student is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Student not found")
-
-    # 2) 最新履歴を取得
-    latest = (
-        await session.execute(
-            select(RentalHistory)
-            .where(RentalHistory.students_id == student.id)
-            .order_by(desc(RentalHistory.rented_at))
-            .limit(1)
-        )
-    ).scalar_one_or_none()
-
-    # 3) レンタル可否判定
-    can_rent = latest is None or latest.returned_at is not None
-    availability = RentAvailabilityData(student_id=student_id, can_rent=can_rent)
-
-    if can_rent:
-        # ---- 借りられる場合は 200 OK ----
-        return CommonResponse(status=200, message="Can Rent", data=availability.model_dump())
-    else:
-        # ---- 借りられない場合は 422 ----
-        return JSONResponse(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-            content=CommonResponse(
-                status=422, message="Cannot Rent", data=availability.model_dump()
-            ).model_dump(),
-        )
-        
->>>>>>> Stashed changes
 @router.get("/stands/list")
 async def get_stand_list(session: AsyncSession = Depends(get_async_session)):
     # 全スタンド取得
