@@ -5,3 +5,9 @@ gpiozero>=1.6.0
 pigpio
 requests
 pyserial
+uvicorn
+fastapi
+sqlalchemy
+dotenv
+asyncpg
+greenlet
