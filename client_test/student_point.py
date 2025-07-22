@@ -2,7 +2,7 @@ import requests
 
 # ======== 設定 ========
 #BASE_URL = "http://localhost:8000"  # 本番では実際のAPIサーバーURLに変更
-BASE_URL = "http://api.chukyo-parashare.com:8000"
+BASE_URL = "http://127.0.0.1:8000"
 student_id = "t323088"  # NFCなどから取得した学籍番号
 endpoint = f"{BASE_URL}/students/{student_id}/auth"
 
