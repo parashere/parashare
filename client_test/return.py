@@ -10,7 +10,7 @@ endpoint = f"{BASE_URL}/parasols/{rfid_tag}/return"
 # ========== リクエストデータ ==========
 payload = {
     "student_id": "t323088",
-    "return_stand_to": "ecb0107c-bb7d-4587-a7ca-4b10e51db92b"
+    "stand_id": "ecb0107c-bb7d-4587-a7ca-4b10e51db92b"
 }
 
 headers = {

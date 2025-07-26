@@ -1,11 +1,11 @@
-from fastapi import APIRouter, Path, Depends,status,HTTPException
+from fastapi import APIRouter, Path, Depends, status, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select, func, and_, desc
+from sqlalchemy import select, func, desc
 from app.db.database import get_async_session
-from app.db.db_models import Students,ParaStand, Parasol, RentalHistory, Parasol, RentalHistory, ParaStand, ParasolStatus
+from app.db.db_models import Students, ParaStand, Parasol, RentalHistory, ParasolStatus
 from app.schemas.api_schemas import StudentAuthRequest, CommonResponse, StudentAuthData, RentRequest, ErrorResponse, RentAvailabilityData, ReturnRequest, LockLogRequest, StandStatusData, MeData
 from fastapi.responses import JSONResponse
-from uuid import UUID,uuid4
+from uuid import UUID, uuid4
 from datetime import datetime, timedelta
 from fastapi.logger import logger
 
@@ -34,7 +34,7 @@ async def auth_or_register_student(
             content=CommonResponse(
                 status=201,
                 message="New Registration Successful",
-                data=StudentAuthData(valid=True, student_id=new_student.student_id).dict()
+                data=StudentAuthData(student_id=new_student.student_id).dict()
             ).dict()
         )
 
@@ -42,7 +42,7 @@ async def auth_or_register_student(
     return CommonResponse(
         status=200,
         message="Authentication Successful",
-        data=StudentAuthData(valid=True, student_id=student.student_id).dict()
+        data=StudentAuthData(student_id=student.student_id).dict()
     )
     
 @router.post("/students/{student_id}", response_model=CommonResponse)
@@ -61,7 +61,7 @@ async def check_student_can_rent(
             detail="Student not found"
         )
 
-    # 最新のレンタル履歴を 1 件だけ取得
+    # 最新のレンタル履歴を1件取得
     res_history = await session.execute(
         select(RentalHistory)
         .where(RentalHistory.students_id == student.id)
@@ -69,24 +69,17 @@ async def check_student_can_rent(
         .limit(1)
     )
     latest = res_history.scalar_one_or_none()
-    
-    # 履歴が無い、または返却済みなら OK
-    if latest is None or latest.returned_at is not None:
-        
-        availability = RentAvailabilityData(student_id=student_id, can_rent=True)
-        
-        return CommonResponse(
-            status=200,
-            message="Can Rent",
-            data=availability.model_dump()
-        )
 
-    availability = RentAvailabilityData(student_id=student_id, can_rent=False)
-    # 返却されていない ⇒ 現在レンタル中なので No
+    status = "rent" if latest is None or latest.returned_at is not None else "return"
+
+    availability = RentAvailabilityData(
+        student_id=student_id,
+        status=status
+    )
+
     return CommonResponse(
-        
         status=200,
-        message="Can Return",
+        message="Can Rent" if status == "rent" else "Can Return",
         data=availability.model_dump()
     )
 
@@ -180,7 +173,7 @@ async def return_parasol(
     )
     parasol = result.scalar_one_or_none()
     if parasol is None:
-        raise HTTPException(status_code=400, detail="unbrella not found")
+        raise HTTPException(status_code=400, detail="umbrella not found")
 
     # 学生情報取得（student_id → UUID）
     result = await session.execute(
@@ -204,7 +197,7 @@ async def return_parasol(
 
     # 更新処理
     now = datetime.now()
-    rental.return_stand_to = stand.id
+    rental.return_stand_to = body.stand_id
     rental.return_parasol_id = parasol.id
     rental.returned_at = now
 
@@ -216,9 +209,8 @@ async def return_parasol(
     # レスポンス
     return CommonResponse(
         status=200,
-        message="傘の返却に成功しました",
+        message="Successful return umbrella",
         data={
             "returned_at": now.isoformat(),
-            "student_id": body.student_id
         }
     )
