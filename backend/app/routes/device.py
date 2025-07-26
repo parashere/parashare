@@ -85,8 +85,8 @@ async def check_student_can_rent(
     # 4) 返却されていない ⇒ 現在レンタル中なので No
     return CommonResponse(
         
-        status=422,
-        message="Cannot Rent",
+        status=200,
+        message="Can Return",
         data=availability.model_dump()
     )
 
@@ -135,11 +135,11 @@ async def rent_parasol(
     )
     student = result.scalar_one_or_none()
     if not student:
-        raise HTTPException(status_code=401, detail="student not found")
+        raise HTTPException(status_code=400, detail="student not found")
 
     stand = await session.get(ParaStand, body.stand_id)
     if not stand:
-        raise HTTPException(status_code=402, detail="stand not found")
+        raise HTTPException(status_code=400, detail="stand not found")
 
     now = datetime.now()
     due = now + timedelta(days=2)
@@ -168,46 +168,57 @@ async def rent_parasol(
         }
     )
 
-@router.post("/parasols/{rfid}/return")
+@router.post("/parasols/{rfid}/return", response_model=CommonResponse)
 async def return_parasol(
     body: ReturnRequest,
     rfid: str = Path(..., description="RFIDタグ"),
     session: AsyncSession = Depends(get_async_session)
 ):
-    # 該当する傘の取得
+    # 1. 傘の取得
     result = await session.execute(
         select(Parasol).where(Parasol.rfid_id == rfid)
     )
     parasol = result.scalar_one_or_none()
-    if not parasol:
-        raise HTTPException(status_code=404, detail="傘が見つかりません")
+    if parasol is None:
+        raise HTTPException(status_code=400, detail="unbrella not found")
 
-    # 現在の貸出履歴を取得（返却されていないもの）
+    # 2. 学生情報取得（student_id → UUID）
     result = await session.execute(
-        select(RentalHistory)
-        .where(
-            RentalHistory.rent_parasol_id == parasol.id,
-            RentalHistory.returned_at.is_(None)
-        )
-        .order_by(RentalHistory.rented_at.desc())  # 念のため最新を優先
-        .limit(1)
+        select(Students).where(Students.student_id == body.student_id)
     )
-    rental = result.scalar_one_or_none()
-    if not rental:
-        raise HTTPException(status_code=404, detail="返却対象の履歴が見つかりません")
+    student = result.scalar_one_or_none()
+    if student is None:
+        raise HTTPException(status_code=400, detail="student not found")
 
-    # スタンド確認
-    stand = await session.get(ParaStand, body.return_stand_to)
-    if not stand:
-        raise HTTPException(status_code=404, detail="返却スタンドが見つかりません")
+    # 3. 学生が借りている傘のレンタル履歴を取得
+    rental = await session.execute(
+        select(RentalHistory).where(
+            RentalHistory.rent_parasol_id == parasol.id,
+            RentalHistory.students_id == student.id,
+            RentalHistory.returned_at == None
+        )
+    )
+    rental = rental.scalar_one_or_none()
+    if rental is None:
+        raise HTTPException(status_code=400, detail="umbrella not rented by student")
 
-    # 更新処理
+    # 4. 更新処理
+    now = datetime.now()
     rental.return_stand_to = stand.id
     rental.return_parasol_id = parasol.id
-    rental.returned_at = datetime.now()
+    rental.returned_at = now
 
     parasol.status = ParasolStatus.available
+    parasol.updated_at = now
 
     await session.commit()
 
-    return {"status": "returned", "returned_at": rental.returned_at.isoformat()}
+    # 5. レスポンス
+    return CommonResponse(
+        status=200,
+        message="傘の返却に成功しました",
+        data={
+            "returned_at": now.isoformat(),
+            "student_id": body.student_id
+        }
+    )

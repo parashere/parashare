@@ -89,5 +89,6 @@ class PointOperationRequest(BaseModel):
     reason: Optional[str] = Field(None, description="理由（任意）")
 
 class ReturnRequest(BaseModel):
+    student_id: str           
     return_stand_to: UUID
 
