@@ -32,7 +32,7 @@ class RFIDReader:
             return True  # シミュレーションモードでは成功として扱う
             
         try:
-            self.ser = serial.Serial(self.port, self.baud_rate, timeout=2)
+            self.ser = serial.Serial(self.port, self.baud_rate, timeout=0.8)  # タイムアウトを短縮
             log_msg = f"RFID Reader connected to {self.port}"
             logger.info(log_msg)
             self.logs.append(log_msg)
@@ -57,12 +57,15 @@ class RFIDReader:
             return None
             
         try:
+            # バッファをクリア
+            self.ser.reset_input_buffer()
+            
             # コマンドを送信
             command_to_send = bytes([0x7C, 0xFF, 0xFF, 0x20, 0x00, 0x00, 0x66])
             self.ser.write(command_to_send)
             
-            # 応答を待つ
-            time.sleep(0.1)
+            # 応答を待つ（時間短縮）
+            time.sleep(0.05)  # 0.1から0.05に短縮
             response = self.ser.read(128)
             
             if response and response.startswith(b'\xCC\xFF\xFF\x20\x02'):
@@ -105,8 +108,9 @@ class RFIDReader:
                 read_attempts.append(attempt_log)
                 self.logs.append(attempt_log)
                 
-                # 次の読み取りまで少し待つ
-                time.sleep(0.01)
+                # 次の読み取りまでの待機時間を削減
+                if i < count - 1:  # 最後の読み取りでは待機しない
+                    time.sleep(0.005)  # 0.01から0.005に短縮
             
             # 最も多く検出されたIDを返す
             if tag_ids:
