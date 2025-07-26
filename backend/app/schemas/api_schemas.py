@@ -34,12 +34,12 @@ class PointData(BaseModel):
 
 # 傘の貸出リクエスト
 class RentRequest(BaseModel):
-    stand_id: str = Field(..., example="ST01")
-    student_id: str = Field(..., example="c7fb8b5e-3d03-4b2e-9e31-de2b1e6f2e7a")
+    stand_id: str
+    student_id: str
 
 # 返却リクエスト
 class ReturnRequest(BaseModel):
-    stand_id: str = Field(..., example="ST02")
+    return_stand_to: UUID
 
 # 鍵操作リクエスト
 class LockLogRequest(BaseModel):
@@ -87,3 +87,7 @@ class LockOperationRequest(BaseModel):
 class PointOperationRequest(BaseModel):
     delta: int = Field(..., description="正の値で加算、負の値で減算")
     reason: Optional[str] = Field(None, description="理由（任意）")
+
+class ReturnRequest(BaseModel):
+    return_stand_to: UUID
+

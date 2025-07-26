@@ -1,26 +1,30 @@
 import requests
+import uuid
 
-#BASE_URL = "http://localhost:8000"
-BASE_URL = "http://150.42.11.227:8000/"
+# ========== 設定 ==========
+BASE_URL = "http://127.0.0.1:8000"  # FastAPIサーバーのURL
+rfid_tag = "01"          # NFCから読み取ったRFID
+endpoint = f"{BASE_URL}/parasols/{rfid_tag}/rent"
 
-rfid = "RFID001"
-endpoint = f"{BASE_URL}/parasols/{rfid}/rent"
-
+# ========== リクエストデータ ==========
 payload = {
-    "student_id": "t323088",  # 実際に存在する学籍番号
-    "stand_id": "a842c4ac-xxxx-xxxx-xxxx-xxxxxxxxxxxx"  # 実在するスタンドID（UUID文字列）
+    "student_id": "t323088",
+    "stand_id": "ecb0107c-bb7d-4587-a7ca-4b10e51db92b" 
 }
 
 headers = {
     "Content-Type": "application/json"
 }
-
+# ========== 送信 ==========
 try:
-    response = requests.post(endpoint, json=payload, headers=headers, timeout=5)
+    response = requests.post(endpoint, json=payload, headers=headers,timeout=5)
     response.raise_for_status()
-    print(f"{response.status_code} OK")
-    print(response.json())
+    result = response.json()
+
+    print("貸出成功")
+    print("返却期限:", result["data"]["due"])
 
 except requests.exceptions.HTTPError as errh:
-    print("HTTPエラー:", errh)
-    print("レスポンス:", response.text)
+    print("HTTPエラー:", errh.response.status_code, errh.response.text)
+except requests.exceptions.RequestException as e:
+    print("通信エラー:", str(e))
