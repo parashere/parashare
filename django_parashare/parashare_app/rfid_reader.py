@@ -32,7 +32,7 @@ class RFIDReader:
             return True  # シミュレーションモードでは成功として扱う
             
         try:
-            self.ser = serial.Serial(self.port, self.baud_rate, timeout=0.8)  # タイムアウトを短縮
+            self.ser = serial.Serial(self.port, self.baud_rate, timeout=1)  # タイムアウトを短縮
             log_msg = f"RFID Reader connected to {self.port}"
             logger.info(log_msg)
             self.logs.append(log_msg)
