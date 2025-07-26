@@ -20,13 +20,12 @@ class StudentAuthRequest(BaseModel):
     stand_id: str  # スタンドのID（例: ST01）
     
 class StudentAuthData(BaseModel):
-    valid: bool
     student_id: str
     
 # 学籍番号が現在レンタル可能かどうかを返す専用レスポンス
 class RentAvailabilityData(BaseModel):
     student_id: str
-    can_rent: bool  # True → 貸出可 / False → 貸出不可
+    status: Literal["rent", "return"]  # "rent" → 貸出可 / "return" → 返却可
 
 # ポイント情報
 class PointData(BaseModel):
@@ -34,12 +33,14 @@ class PointData(BaseModel):
 
 # 傘の貸出リクエスト
 class RentRequest(BaseModel):
-    stand_id: str = Field(..., example="ST01")
-    student_id: str = Field(..., example="c7fb8b5e-3d03-4b2e-9e31-de2b1e6f2e7a")
+    student_id: str
+    stand_id: str
 
-# 返却リクエスト
+# 傘の返却リクエスト   
 class ReturnRequest(BaseModel):
-    stand_id: str = Field(..., example="ST02")
+    student_id: str           
+    stand_id: str
+
 
 # 鍵操作リクエスト
 class LockLogRequest(BaseModel):
@@ -83,7 +84,3 @@ class RentalHistoryData(RootModel[list[RentalHistoryItem]]):
 class LockOperationRequest(BaseModel):
     action: Literal["open", "close"]
 
-# ポイント操作
-class PointOperationRequest(BaseModel):
-    delta: int = Field(..., description="正の値で加算、負の値で減算")
-    reason: Optional[str] = Field(None, description="理由（任意）")
