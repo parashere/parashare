@@ -1,8 +1,11 @@
+from dotenv import load_dotenv
+import os
 import requests
 import uuid
 
-# ========== 設定 ==========
-BASE_URL = "http://127.0.0.1:8000"  # FastAPIサーバーのURL
+# ======== 設定 ========
+load_dotenv()
+BASE_URL = os.getenv("BASE_URL", "http://localhost:8000")  # デフォルト値を設定
 rfid_tag = "01"          # NFCから読み取ったRFID
 endpoint = f"{BASE_URL}/parasols/{rfid_tag}/rent"
 

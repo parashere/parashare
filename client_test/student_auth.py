@@ -1,8 +1,10 @@
+from dotenv import load_dotenv
+import os
 import requests
 
 # ======== 設定 ========
-#BASE_URL = "http://localhost:8000"  # 本番では実際のAPIサーバーURLに変更
-BASE_URL = "http://127.0.0.1:8000"
+load_dotenv()
+BASE_URL = os.getenv("BASE_URL", "http://localhost:8000")  # デフォルト値を設定
 student_id = "t323088"  # NFCなどから取得した学籍番号
 endpoint = f"{BASE_URL}/students/{student_id}/auth"
 
